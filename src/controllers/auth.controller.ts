@@ -24,8 +24,6 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: SingInDto): Promise<any> {
-    console.log('body', body);
-
     return this.authServeice.signIn(body.maso, body.matkhau, body.type);
   }
 
