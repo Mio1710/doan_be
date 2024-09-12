@@ -13,8 +13,8 @@ export class Student extends BaseEntity {
   @Column({ length: 50, type: 'varchar' })
   ten: string;
 
-  @Column({ length: 50, type: 'char' })
-  hinhanh: string;
+  @Column({ length: 50, type: 'char', nullable: true })
+  hinhanh?: string;
 
   @Column({ length: 50, type: 'char' })
   email: string;

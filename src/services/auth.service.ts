@@ -25,13 +25,15 @@ export class AuthService {
     let user;
     let typeUser = 'student';
     if (type) {
+      console.log('type', type);
       user = await this.usersService.findOne({ maso: maso });
-      typeUser = user.type;
+      typeUser = user.types;
     } else {
+      console.log('type student', type);
       user = await this.studentService.findOne({ maso: maso });
+      console.log('user student', user, maso);
     }
-    console.log('user neffffffff', user, pass, user.matkhau);
-
+    console.log('user', user);
     if (!user) {
       throw new UnauthorizedException();
     } else {
@@ -44,7 +46,7 @@ export class AuthService {
     const payload = {
       sub: user.maso,
       id: user.id,
-      role: typeUser,
+      roles: typeUser,
     };
     console.log('payload before return', payload);
 

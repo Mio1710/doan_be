@@ -28,7 +28,7 @@ export class AddAdminCommand extends CommandRunner {
       ten: 'admin',
       email: 'admin@iuh.com',
       phone: '0123456789',
-      type: 'admin',
+      types: ['admin'],
       matkhau,
     };
 

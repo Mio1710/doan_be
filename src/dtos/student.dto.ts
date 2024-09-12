@@ -1,17 +1,6 @@
-import { IsArray, IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, Length } from 'class-validator';
 
-export class CreateUserDTO {
-  maso: string;
-  hodem: string;
-  ten: string;
-  email: string;
-  matkhau: string;
-  phone: string;
-  types: string[];
-  facultyId?: number;
-}
-
-export class CreateTeacherDto {
+export class CreateStudentDto {
   @IsNotEmpty()
   maso: string;
 
@@ -34,13 +23,9 @@ export class CreateTeacherDto {
 
   @IsNotEmpty()
   facultyId: number;
-
-  @IsArray()
-  @IsOptional()
-  types: string[] = ['teacher'];
 }
 
-export class UpdateTeacherDto {
+export class UpdateStudentDto {
   @IsNotEmpty()
   maso: string;
 
@@ -63,8 +48,4 @@ export class UpdateTeacherDto {
 
   @IsOptional()
   facultyId?: number;
-
-  @IsArray()
-  @IsOptional()
-  types: string[] = ['teacher'];
 }

@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/entities';
 import { UserService, AuthService } from 'src/services';
-import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto, CreateUserDTO, SingInDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -43,7 +42,7 @@ export class AuthController {
       ten: 'admin',
       email: 'admin@iuh.com',
       phone: '0123456789',
-      type: 'admin',
+      types: ['admin'],
       matkhau: '123123123',
     };
 

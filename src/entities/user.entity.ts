@@ -25,8 +25,8 @@ export class User extends BaseEntity {
   @Column({ length: 255, type: 'varchar' })
   matkhau: string;
 
-  @Column({ type: 'enum', enum: ['admin', 'teacher'], default: 'teacher' })
-  type: string;
+  @Column({ type: 'json' })
+  types: string[];
 
   @ManyToOne(() => Faculity)
   @JoinColumn({ name: 'khoa_id' })

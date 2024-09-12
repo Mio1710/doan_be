@@ -16,7 +16,7 @@ export class RequestInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const user = request?.user;
-    console.log('user in request interceptor', user);
+    console.log('user in request interceptor', user, request);
     const query: BaseQuery = request?.query?.conditions;
 
     if (query) {

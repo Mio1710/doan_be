@@ -22,7 +22,7 @@ export class StudentRepository {
   }
 
   async findOne(options: StudentOptions): Promise<Student> {
-    return await this.studentRepository.findOne({ where: { ...options } })[0];
+    return await this.studentRepository.findOne({ where: { ...options } });
   }
 
   async create(Student: Student): Promise<Student> {

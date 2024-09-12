@@ -1,18 +1,25 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { User } from 'src/entities';
-import { UserService } from 'src/services';
+import { Controller, Get, Post, Res, Body } from '@nestjs/common';
+import { CreateStudentDto } from 'src/dtos';
+import { Student } from 'src/entities';
+import { StudentService } from 'src/services';
+import { ResponseUtils } from 'src/utils';
 
 @Controller('students')
 export class StudentController {
-  constructor(private readonly appService: UserService) {}
+  constructor(
+    private readonly studentService: StudentService,
+    private readonly responseUtils: ResponseUtils,
+  ) {}
 
   @Get()
-  getListUsers(): Promise<User[]> {
-    return this.appService.getLists();
+  getListUsers(): Promise<Student[]> {
+    return this.studentService.getLists();
   }
 
   @Post()
-  createUser(user: User): Promise<User> {
-    return this.appService.create(user);
+  async createUser(@Body() student: CreateStudentDto, @Res() res) {
+    const { matkhau, ...data } = await this.studentService.create(student);
+    console.log('matkhau', matkhau);
+    return this.responseUtils.success({ data }, res);
   }
 }

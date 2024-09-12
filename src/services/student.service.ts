@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Student } from 'src/entities';
 import { StudentRepository } from 'src/repositories';
 import * as bcrypt from 'bcrypt';
+import { log } from 'console';
 
 @Injectable()
 export class StudentService {
@@ -14,7 +15,8 @@ export class StudentService {
     return this.studentepository.findAll();
   }
 
-  async create(student: Student): Promise<Student> {
+  async create(student): Promise<Student> {
+    log('student before create', student);
     const isExist = await this.checkExistStudent(student.maso);
     if (isExist) {
       throw new HttpException('Student already exists', 400);
@@ -33,8 +35,18 @@ export class StudentService {
     return this.studentepository.delete(id);
   }
 
-  findOne(options): Promise<Student> {
-    return this.studentepository.findOne(options);
+  async findOne(options): Promise<Student> {
+    try {
+      console.log('options', options);
+
+      const student = await this.studentepository.findOne(options);
+      if (!student) {
+        throw new HttpException('Student not found', 404);
+      }
+      return student;
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   checkExistStudent(maso: string): Promise<Student> {

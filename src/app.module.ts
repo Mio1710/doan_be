@@ -18,6 +18,7 @@ import { RequestInterceptor } from './interceptors/request.interceptor';
 // import { APP_GUARD, Reflector } from '@nestjs/core';
 // import { RolesGuard } from './guards/roles.guard';
 import * as ListUtils from './utils';
+import { BaseSubscriber } from './subscribers/base.subscribe';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import * as ListUtils from './utils';
       provide: APP_INTERCEPTOR,
       useClass: RequestInterceptor,
     },
+    BaseSubscriber,
   ],
 })
 export class AppModule {}
