@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import * as bcrypt from 'bcrypt';
+import * as XLSX from 'xlsx';
 import { UpdateTeacherDto } from 'src/dtos';
 
 // manage teacher/admin
@@ -66,5 +67,43 @@ export class UserService {
 
   checkExistUser(maso: string): Promise<User> {
     return this.useRepository.findOne({ maso });
+  }
+
+  async import(file): Promise<User[]> {
+    try {
+      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+      const workSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(workSheet);
+      console.log('data ExpressExpressExpress', data);
+      const users = await Promise.all(
+        data.map(async (user: User) => {
+          const isExist = await this.checkExistUser(user.maso);
+          if (isExist) {
+            return;
+          }
+
+          user.types = ['teacher'];
+          if (user.is_super_teacher == 1) {
+            user.types.push('super_teacher');
+          }
+          if (user.is_admin == 1) {
+            user.types.push('admin');
+          }
+
+          const saltOrRounds = 10;
+          const hash = await bcrypt.hash('12345678', saltOrRounds);
+          user.matkhau = hash;
+          console.log('user before create', user);
+
+          return await this.useRepository.create(user);
+        }),
+      );
+
+      return users;
+    } catch (error) {
+      console.log('error is_super_teacheris_super_teacher', error);
+
+      throw new HttpException(error, 400);
+    }
   }
 }

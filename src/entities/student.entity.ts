@@ -19,11 +19,14 @@ export class Student extends BaseEntity {
   @Column({ length: 50, type: 'char' })
   email: string;
 
-  @Column({ length: 11, type: 'char' })
-  phone: string;
+  @Column({ length: 11, type: 'char', nullable: true })
+  phone?: string;
 
   @Column({ length: 255, type: 'varchar' })
   matkhau: string;
+
+  @Column({ length: 50, type: 'varchar' })
+  lop: string;
 
   @ManyToOne(() => Faculity)
   @JoinColumn({ name: 'khoa_id' })

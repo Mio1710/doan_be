@@ -12,8 +12,8 @@ import { CreateStudentDto } from 'src/dtos';
 import { StudentService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 
-@Controller('students')
-export class StudentController {
+@Controller('student-topic')
+export class StudentTopicController {
   constructor(
     private readonly studentService: StudentService,
     private readonly responseUtils: ResponseUtils,

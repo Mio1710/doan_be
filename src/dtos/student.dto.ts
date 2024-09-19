@@ -22,7 +22,7 @@ export class CreateStudentDto {
   // matkhau: string;
 
   @IsNotEmpty()
-  facultyId: number;
+  lop: string;
 }
 
 export class UpdateStudentDto {
@@ -47,5 +47,5 @@ export class UpdateStudentDto {
   // matkhau: string;
 
   @IsOptional()
-  facultyId?: number;
+  lop?: string;
 }

@@ -8,7 +8,4 @@ export class CreateSemesterDto {
 export class UpdateSemesterDto {
   @IsNotEmpty()
   ten: string;
-
-  @IsNotEmpty()
-  status: boolean;
 }

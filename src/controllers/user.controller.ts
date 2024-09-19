@@ -7,10 +7,13 @@ import {
   Post,
   Put,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   // UsePipes,
   // ValidationPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateTeacherDto, UpdateTeacherDto } from 'src/dtos';
 import { User } from 'src/entities';
@@ -64,6 +67,15 @@ export class TeacherController {
   @Delete(':id')
   async deleteTeacher(@Param() id: number, @Res() res) {
     const data = await this.userService.delete(id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post('import')
+  @UseInterceptors(FileInterceptor('file'))
+  async importTeacher(@UploadedFile() teachers, @Res() res) {
+    console.log('teachersteachers', teachers);
+
+    const data = await this.userService.import(teachers);
     return this.responseUtils.success({ data }, res);
   }
 }

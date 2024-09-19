@@ -19,7 +19,7 @@ export class User extends BaseEntity {
   @Column({ length: 50, type: 'char' })
   email: string;
 
-  @Column({ length: 11, type: 'char' })
+  @Column({ length: 11, type: 'char', nullable: true })
   phone: string;
 
   @Column({ length: 255, type: 'varchar' })
@@ -31,4 +31,7 @@ export class User extends BaseEntity {
   @ManyToOne(() => Faculity)
   @JoinColumn({ name: 'khoa_id' })
   facutily?: Faculity;
+
+  is_super_teacher?: number;
+  is_admin?: number;
 }

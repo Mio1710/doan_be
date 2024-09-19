@@ -10,16 +10,20 @@ export class SemesterService {
     private readonly semesterRepository: Repository<Semester>,
   ) {}
 
-  getLists(options): Promise<Semester[]> {
-    return this.semesterRepository.find({ ...options });
+  async getLists(options): Promise<Semester[]> {
+    return await this.semesterRepository
+      .createQueryBuilder('semester')
+      .leftJoinAndSelect('semester.createdBy', 'user')
+      .select(['semester', 'user.ten', 'user.hodem', 'user.id'])
+      .getMany();
   }
 
   async create(semester): Promise<Semester> {
     return this.semesterRepository.save(semester);
   }
 
-  update(semester: Semester): Promise<Semester> {
-    return this.semesterRepository.save(semester);
+  async update(id: number, semester: Semester) {
+    return await this.semesterRepository.update(id, semester);
   }
 
   async delete(id: number): Promise<Semester[]> {

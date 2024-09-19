@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { CreateSemesterDto } from 'src/dtos';
 import { Semester } from 'src/entities';
@@ -41,6 +42,19 @@ export class SemesterController {
     console.log('semester id', id);
 
     const data = await this.semesterService.findOne({ id });
+    console.log('semester data', data);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put(':id')
+  async updateSemester(
+    @Param() id: number,
+    @Body() semester: Partial<Semester>,
+    @Res() res,
+  ) {
+    console.log('semester id', id);
+
+    const data = await this.semesterService.update(id, semester as Semester);
     console.log('semester data', data);
     return this.responseUtils.success({ data }, res);
   }
