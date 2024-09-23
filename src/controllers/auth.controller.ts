@@ -57,4 +57,9 @@ export class AuthController {
       body.newPassword,
     );
   }
+
+  @Post('logout')
+  logout(@Request() req) {
+    return this.authServeice.logout();
+  }
 }

@@ -1,6 +1,8 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { Faculity } from './faculity.entity';
 import { BaseEntity } from './base.entity';
+import { StudentSubject } from './studentSubject.entity';
+import { Topic } from './topic.entity';
 
 @Entity('student')
 export class Student extends BaseEntity {
@@ -31,4 +33,10 @@ export class Student extends BaseEntity {
   @ManyToOne(() => Faculity)
   @JoinColumn({ name: 'khoa_id' })
   facutily: Faculity;
+
+  @OneToMany(() => StudentSubject, (studentSubject) => studentSubject.student)
+  studentSubject: StudentSubject[];
+
+  @ManyToOne(() => Topic)
+  topic: Topic;
 }

@@ -81,4 +81,10 @@ export class AuthService {
       throw new HttpException(error.message, error.code ?? 400);
     }
   }
+
+  async logout() {
+    // delete the token
+
+    return;
+  }
 }

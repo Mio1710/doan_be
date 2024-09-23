@@ -4,3 +4,4 @@ export * from './student.controller';
 export * from './auth.controller';
 export * from './semester.controller';
 export * from './student-topic.controller';
+export * from './topic.controller';

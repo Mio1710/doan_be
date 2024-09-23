@@ -6,12 +6,16 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateStudentDto } from 'src/dtos';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 import { StudentService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('student-topic')
 export class StudentTopicController {
   constructor(
@@ -38,6 +42,14 @@ export class StudentTopicController {
     console.log('students students students students students', students);
 
     const data = await this.studentService.import(students);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Get('registed')
+  async getTopicRegistedDetail(@Res() res) {
+    const data = await this.studentService.getRegistedDetail();
+    console.log('topic data', data);
+
     return this.responseUtils.success({ data }, res);
   }
 }

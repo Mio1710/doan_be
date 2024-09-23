@@ -1,16 +1,21 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Student } from 'src/entities';
+import { Student, Topic } from 'src/entities';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ClsService } from 'nestjs-cls';
+import { StudentSubject } from 'src/entities/studentSubject.entity';
 
 @Injectable()
 export class StudentService {
   constructor(
     @InjectRepository(Student)
     private studentepository: Repository<Student>,
+    @InjectRepository(StudentSubject)
+    private studentSubjectRepository: Repository<StudentSubject>,
+    private cls: ClsService,
   ) {}
 
   getLists(): Promise<Student[]> {
@@ -41,7 +46,9 @@ export class StudentService {
     try {
       console.log('options', options);
 
-      const student = await this.studentepository.findOne(options);
+      const student = await this.studentepository.findOne({
+        where: { ...options },
+      });
       if (!student) {
         throw new HttpException('Student not found', 404);
       }
@@ -83,5 +90,33 @@ export class StudentService {
 
       throw new HttpException(error, 400);
     }
+  }
+
+  async getRegistedDetail() {
+    const userId = this.cls.get('userId');
+    const result = {
+      topic: null,
+      students: [],
+    };
+
+    result.topic = await this.studentSubjectRepository.query(`
+        SELECT topic.id, topic.ten as detai, topic.description, topic.requirement, topic.knowledge, topic.created_by, user.ten, user.hodem
+        FROM student_subject
+        LEFT JOIN topic ON student_subject.subject_id = topic.id
+        LEFT JOIN user ON topic.teacher_id = user.id
+        WHERE student_subject.student_id = ${userId}
+          AND student_subject.subject_type = 'topic'
+      `);
+
+    if (result.topic[0]?.id) {
+      result.students = await this.studentSubjectRepository.query(`
+        SELECT student.id, student.maso, student.ten, student.hodem, student.lop, student_subject.group
+        FROM student_subject
+        LEFT JOIN student ON student_subject.student_id = student.id
+        WHERE student_subject.subject_id = ${result.topic[0].id}
+          AND student_subject.subject_type = 'topic'
+      `);
+    }
+    return result;
   }
 }
