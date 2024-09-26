@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   Res,
   UploadedFile,
   UseGuards,
@@ -15,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
-import { CreateTeacherDto, UpdateTeacherDto } from 'src/dtos';
+import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { User } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -44,7 +45,7 @@ export class TeacherController {
   }
 
   @Post()
-  async createTeacher(@Body() user: CreateTeacherDto, @Res() res) {
+  async createTeacher(@Body() user: CreateUserDTO, @Res() res) {
     const { matkhau, ...data } = await this.userService.create(user);
     console.log('matkhau', matkhau);
     return this.responseUtils.success({ data }, res);
@@ -72,9 +73,16 @@ export class TeacherController {
 
   @Post('import')
   @UseInterceptors(FileInterceptor('file'))
-  async importTeacher(@UploadedFile() teachers, @Res() res) {
-    console.log('teachersteachers', teachers);
-
+  async importTeacher(@UploadedFile() teachers, @Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    if (!khoa_id) {
+      return this.responseUtils.failed(
+        {
+          message: 'Bạn không có quyền thực hiện chức năng này',
+        },
+        res,
+      );
+    }
     const data = await this.userService.import(teachers);
     return this.responseUtils.success({ data }, res);
   }

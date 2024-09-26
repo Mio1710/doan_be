@@ -1,17 +1,17 @@
 import { IsArray, IsNotEmpty, IsOptional, Length } from 'class-validator';
 
+// export class CreateUserDTO {
+//   maso: string;
+//   hodem: string;
+//   ten: string;
+//   email: string;
+//   matkhau: string;
+//   phone: string;
+//   types: string[];
+//   facultyId?: number;
+// }
+
 export class CreateUserDTO {
-  maso: string;
-  hodem: string;
-  ten: string;
-  email: string;
-  matkhau: string;
-  phone: string;
-  types: string[];
-  facultyId?: number;
-}
-
-export class CreateTeacherDto {
   @IsNotEmpty()
   maso: string;
 
@@ -24,7 +24,7 @@ export class CreateTeacherDto {
   @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   phone: string;
 
   @IsOptional()
@@ -32,8 +32,8 @@ export class CreateTeacherDto {
   matkhau: string = '123456';
   // matkhau: string;
 
-  @IsNotEmpty()
-  facultyId: number;
+  @IsOptional()
+  khoa_id?: number;
 
   @IsArray()
   @IsOptional()

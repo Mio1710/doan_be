@@ -1,8 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Topic } from '../entities';
+import { Semester, Topic } from '../entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
+import { ListTopicQuery } from 'src/interfaces/queries/listTopic.interface';
+import { SemesterService } from './semester.service';
 
 @Injectable()
 export class TopicService {
@@ -10,14 +12,23 @@ export class TopicService {
     @InjectRepository(Topic)
     private readonly topicRepository: Repository<Topic>,
 
+    @InjectRepository(Semester)
+    private readonly semesterRepository: Repository<Semester>,
+
+    private readonly semesterService: SemesterService,
     private readonly cls: ClsService,
   ) {}
 
-  async getLists(): Promise<Topic[]> {
+  async getLists(options?: ListTopicQuery): Promise<Topic[]> {
+    let semester_id = options?.semester_id;
+    if (!semester_id) {
+      semester_id = await this.semesterService.getActiveSemester();
+    }
     return await this.topicRepository
       .createQueryBuilder('topic')
       .leftJoinAndSelect('topic.createdBy', 'user')
       .select(['topic', 'user.ten', 'user.hodem', 'user.id'])
+      .where('topic.semester_id = :semester_id', { semester_id })
       .getMany();
   }
 
@@ -70,5 +81,26 @@ export class TopicService {
       .leftJoinAndSelect('studentSubjects.student', 'student')
       .select(['studentSubjects', 'student', 'topic'])
       .getOne();
+  }
+
+  async getListTopic(
+    options?: ListTopicQuery,
+    khoa_id?: number,
+  ): Promise<Topic[]> {
+    let semester = options?.semester_id;
+    if (!semester) {
+      semester = await this.semesterRepository
+        .createQueryBuilder('semester')
+        .select('semester.id')
+        .where('semester.status = :status', { status: 'active' })
+        .getRawOne();
+    }
+    console.log('semester_id', semester);
+    const topics = await this.topicRepository
+      .createQueryBuilder('topic')
+      .where('topic.khoa_id = :khoa_id', { khoa_id: khoa_id })
+      .getMany();
+
+    return topics;
   }
 }

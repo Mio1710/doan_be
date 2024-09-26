@@ -69,4 +69,14 @@ export class SemesterService {
       throw new HttpException(error, 400);
     }
   }
+
+  async getActiveSemester(): Promise<number> {
+    const semester = await this.semesterRepository.findOne({
+      where: { status: true },
+    });
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    return semester.id;
+  }
 }

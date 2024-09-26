@@ -1,3 +1,3 @@
 export * from './user.repository';
-export * from './faculity.repository';
+export * from './faculty.repository';
 export * from './student.repository';

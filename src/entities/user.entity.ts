@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Faculity } from './faculity.entity';
+import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
 
 @Entity()
@@ -28,9 +28,9 @@ export class User extends BaseEntity {
   @Column({ type: 'json' })
   types: string[];
 
-  @ManyToOne(() => Faculity)
+  @ManyToOne(() => Faculty)
   @JoinColumn({ name: 'khoa_id' })
-  facutily?: Faculity;
+  faculty?: Faculty;
 
   is_super_teacher?: number;
   is_admin?: number;

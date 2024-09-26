@@ -1,8 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class FaculityDto {
-  @IsNotEmpty()
-  makhoa: string;
+export class FacultyDto {
+  ma_khoa?: string;
 
   @IsNotEmpty()
   ten: string;

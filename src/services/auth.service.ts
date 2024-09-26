@@ -47,6 +47,7 @@ export class AuthService {
       sub: user.maso,
       id: user.id,
       roles: typeUser,
+      khoaId: user.khoa_id ?? null,
     };
     console.log('payload before return', payload);
 

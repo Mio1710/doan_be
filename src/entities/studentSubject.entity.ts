@@ -8,6 +8,7 @@ import {
 import { Student } from './student.entity';
 import { Topic } from './topic.entity';
 import { Semester } from './semester.entity';
+import { Faculty } from './faculty.entity';
 
 @Entity('student_subject')
 export class StudentSubject {
@@ -33,4 +34,8 @@ export class StudentSubject {
   @ManyToOne(() => Semester)
   @JoinColumn({ name: 'semester_id' })
   semester: Semester;
+
+  @ManyToOne(() => Faculty)
+  @JoinColumn({ name: 'khoa_id' })
+  faculty: Faculty;
 }

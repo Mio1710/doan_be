@@ -3,7 +3,7 @@ import { User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
-import { UpdateTeacherDto } from 'src/dtos';
+import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 
 // manage teacher/admin
 // need exclude password field
@@ -19,7 +19,7 @@ export class UserService {
     return this.useRepository.findAll();
   }
 
-  async create(user): Promise<User> {
+  async create(user: CreateUserDTO): Promise<User> {
     const isExist = await this.checkExistUser(user.maso);
     if (isExist) {
       throw new HttpException('User already exists', 400);

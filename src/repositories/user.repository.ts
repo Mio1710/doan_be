@@ -28,7 +28,9 @@ export class UserRepository {
     return await this.userRepository.findOne({ where: { ...options } });
   }
 
-  async create(user: CreateUserDTO): Promise<User> {
+  async create(user): Promise<User> {
+    console.log('user before create repository', user);
+    user.faculty = { id: user.khoa_id };
     return await this.userRepository.save(user);
   }
 

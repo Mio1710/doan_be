@@ -1,5 +1,12 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
-import { Faculity } from './faculity.entity';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
+import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
 import { StudentSubject } from './studentSubject.entity';
 import { Topic } from './topic.entity';
@@ -30,9 +37,9 @@ export class Student extends BaseEntity {
   @Column({ length: 50, type: 'varchar' })
   lop: string;
 
-  @ManyToOne(() => Faculity)
+  @ManyToOne(() => Faculty)
   @JoinColumn({ name: 'khoa_id' })
-  facutily: Faculity;
+  facutily: Faculty;
 
   @OneToMany(() => StudentSubject, (studentSubject) => studentSubject.student)
   studentSubject: StudentSubject[];

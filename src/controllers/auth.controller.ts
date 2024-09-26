@@ -42,7 +42,7 @@ export class AuthController {
       ten: 'admin',
       email: 'admin@iuh.com',
       phone: '0123456789',
-      types: ['admin'],
+      types: ['super_admin'],
       matkhau: '123123123',
     };
 
