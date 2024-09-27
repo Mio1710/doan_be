@@ -21,6 +21,7 @@ export class UserService {
 
   async create(user: CreateUserDTO): Promise<User> {
     const isExist = await this.checkExistUser(user.maso);
+    console.log('user before isExist', isExist, user.maso);
     if (isExist) {
       throw new HttpException('User already exists', 400);
     }
@@ -56,6 +57,8 @@ export class UserService {
       console.log('options', options);
 
       const user = await this.useRepository.findOne(options);
+      console.log('check user findone', user);
+
       if (!user) {
         throw new HttpException('User not found', 404);
       }
@@ -69,7 +72,7 @@ export class UserService {
     return this.useRepository.findOne({ maso });
   }
 
-  async import(file): Promise<User[]> {
+  async import(file, khoa_id: number): Promise<User[]> {
     try {
       const workbook = XLSX.read(file.buffer, { type: 'buffer' });
       const workSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -94,6 +97,8 @@ export class UserService {
           const hash = await bcrypt.hash('12345678', saltOrRounds);
           user.matkhau = hash;
           console.log('user before create', user);
+          // add khoa_id
+          user.khoa_id = khoa_id;
 
           return await this.useRepository.create(user);
         }),

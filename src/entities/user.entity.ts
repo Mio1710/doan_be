@@ -28,6 +28,9 @@ export class User extends BaseEntity {
   @Column({ type: 'json' })
   types: string[];
 
+  @Column({ name: 'khoa_id', nullable: true })
+  khoa_id: number;
+
   @ManyToOne(() => Faculty)
   @JoinColumn({ name: 'khoa_id' })
   faculty?: Faculty;

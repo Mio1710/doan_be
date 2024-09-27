@@ -59,7 +59,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Request() req) {
+  logout() {
     return this.authServeice.logout();
   }
 }

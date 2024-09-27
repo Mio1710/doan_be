@@ -40,8 +40,9 @@ export class TeacherController {
   }
 
   @Get()
-  getListTeachers(): Promise<User[]> {
-    return this.userService.getLists();
+  async getListTeachers(@Res() res) {
+    const data = await this.userService.getLists();
+    return this.responseUtils.success({ data }, res);
   }
 
   @Post()
@@ -75,6 +76,7 @@ export class TeacherController {
   @UseInterceptors(FileInterceptor('file'))
   async importTeacher(@UploadedFile() teachers, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
+
     if (!khoa_id) {
       return this.responseUtils.failed(
         {
@@ -83,7 +85,7 @@ export class TeacherController {
         res,
       );
     }
-    const data = await this.userService.import(teachers);
+    const data = await this.userService.import(teachers, khoa_id);
     return this.responseUtils.success({ data }, res);
   }
 }
