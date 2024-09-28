@@ -15,8 +15,8 @@ export class UserService {
     this.useRepository = userRepository;
   }
 
-  getLists(): Promise<User[]> {
-    return this.useRepository.findAll();
+  getLists(options): Promise<User[]> {
+    return this.useRepository.findAll(options);
   }
 
   async create(user: CreateUserDTO): Promise<User> {

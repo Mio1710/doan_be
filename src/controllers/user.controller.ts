@@ -40,8 +40,10 @@ export class TeacherController {
   }
 
   @Get()
-  async getListTeachers(@Res() res) {
-    const data = await this.userService.getLists();
+  async getListTeachers(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const options = { where: { khoa_id } };
+    const data = await this.userService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
 
