@@ -21,8 +21,12 @@ export class StudentController {
   ) {}
 
   @Get()
-  async getListUsers(@Res() res) {
-    const data = await this.studentService.getLists();
+  async getListUsers(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const options = { where: { khoa_id } };
+    const data = await this.studentService.getLists(options);
+    console.log('dataaaaaaa', data);
+
     return this.responseUtils.success({ data }, res);
   }
 

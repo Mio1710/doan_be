@@ -21,8 +21,8 @@ export class StudentService {
     private readonly semesterRepository: Repository<Semester>,
   ) {}
 
-  getLists(): Promise<Student[]> {
-    return this.studentepository.find();
+  getLists(options): Promise<Student[]> {
+    return this.studentepository.find({ ...options });
   }
 
   async create(student): Promise<Student> {
