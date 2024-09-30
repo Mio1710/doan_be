@@ -21,8 +21,8 @@ export class StudentService {
     private readonly semesterRepository: Repository<Semester>,
   ) {}
 
-  getLists(): Promise<Student[]> {
-    return this.studentepository.find();
+  getLists(options): Promise<Student[]> {
+    return this.studentepository.find({ ...options });
   }
 
   async create(student): Promise<Student> {
@@ -65,7 +65,7 @@ export class StudentService {
     return this.studentepository.findOne({ where: { maso, deleted_at: null } });
   }
 
-  async import(file): Promise<Student[]> {
+  async import(file, khoa_id): Promise<Student[]> {
     try {
       const workbook = XLSX.read(file.buffer, { type: 'buffer' });
       const workSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -75,12 +75,13 @@ export class StudentService {
         data.map(async (student: Student) => {
           const isExist = await this.checkExistStudent(student.maso);
           if (isExist) {
-            return;
+            console.log('Student already exists');
           }
 
           const saltOrRounds = 10;
           const hash = await bcrypt.hash('12345678', saltOrRounds);
           student.matkhau = hash;
+          student.khoa_id = khoa_id;
           console.log('user before create', student);
 
           return await this.studentepository.save(student);

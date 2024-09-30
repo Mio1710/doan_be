@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateStudentDto } from 'src/dtos';
@@ -24,8 +25,10 @@ export class StudentTopicController {
   ) {}
 
   @Get()
-  async getListUsers(@Res() res) {
-    const data = await this.studentService.getLists();
+  async getListUsers(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const options = { where: { khoa_id } };
+    const data = await this.studentService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
 
@@ -38,10 +41,11 @@ export class StudentTopicController {
 
   @Post('import')
   @UseInterceptors(FileInterceptor('file'))
-  async importTeacher(@UploadedFile() students, @Res() res) {
+  async importTeacher(@UploadedFile() students, @Res() res, @Req() req) {
     console.log('students students students students students', students);
+    const khoa_id = req.user.khoa_id;
 
-    const data = await this.studentService.import(students);
+    const data = await this.studentService.import(students, khoa_id);
     return this.responseUtils.success({ data }, res);
   }
 

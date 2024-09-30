@@ -18,8 +18,8 @@ export class UserRepository {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+  async findAll(options): Promise<User[]> {
+    return await this.userRepository.find({ ...options });
   }
 
   async findOne(options: UserOptions): Promise<User | null> {

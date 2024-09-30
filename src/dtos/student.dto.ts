@@ -23,6 +23,9 @@ export class CreateStudentDto {
 
   @IsNotEmpty()
   lop: string;
+
+  @IsOptional()
+  khoa_id?: number;
 }
 
 export class UpdateStudentDto {

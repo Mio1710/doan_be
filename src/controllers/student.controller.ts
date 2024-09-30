@@ -6,6 +6,7 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateStudentDto } from 'src/dtos';
@@ -20,13 +21,18 @@ export class StudentController {
   ) {}
 
   @Get()
-  async getListUsers(@Res() res) {
-    const data = await this.studentService.getLists();
+  async getListUsers(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const options = { where: { khoa_id } };
+    const data = await this.studentService.getLists(options);
+    console.log('dataaaaaaa', data);
+
     return this.responseUtils.success({ data }, res);
   }
 
   @Post()
-  async createUser(@Body() student: CreateStudentDto, @Res() res) {
+  async createUser(@Body() student: CreateStudentDto, @Res() res, @Req() req) {
+    student.khoa_id = req.user.khoa_id;
     const { matkhau, ...data } = await this.studentService.create(student);
     console.log('matkhau', matkhau);
     return this.responseUtils.success({ data }, res);
@@ -34,10 +40,10 @@ export class StudentController {
 
   @Post('import')
   @UseInterceptors(FileInterceptor('file'))
-  async importTeacher(@UploadedFile() students, @Res() res) {
+  async importTeacher(@UploadedFile() students, @Res() res, @Req() req) {
     console.log('students students students students students', students);
-
-    const data = await this.studentService.import(students);
+    const khoa_id = req.user.khoa_id;
+    const data = await this.studentService.import(students, khoa_id);
     return this.responseUtils.success({ data }, res);
   }
 }

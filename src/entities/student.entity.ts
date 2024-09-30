@@ -37,13 +37,13 @@ export class Student extends BaseEntity {
   @Column({ length: 50, type: 'varchar' })
   lop: string;
 
+  @Column({ name: 'khoa_id', nullable: true })
+  khoa_id: number;
+
   @ManyToOne(() => Faculty)
   @JoinColumn({ name: 'khoa_id' })
   facutily: Faculty;
 
   @OneToMany(() => StudentSubject, (studentSubject) => studentSubject.student)
   studentSubject: StudentSubject[];
-
-  @ManyToOne(() => Topic)
-  topic: Topic;
 }
