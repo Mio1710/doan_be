@@ -2,8 +2,9 @@ import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { Semester } from './semester.entity';
-import { Student } from './student.entity';
-import { StudentSubject } from './studentSubject.entity';
+import { StudentTopic } from './student-topic.entity';
+import { Faculty } from './faculty.entity';
+import { TopicSemester } from './topic-semester.entity';
 
 @Entity('topic')
 export class Topic extends BaseEntity {
@@ -26,10 +27,6 @@ export class Topic extends BaseEntity {
   })
   status: string;
 
-  @ManyToOne(() => Semester)
-  @JoinColumn({ name: 'semester_id' })
-  semester: Semester;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'teacher_id' })
   teacher: User;
@@ -38,9 +35,16 @@ export class Topic extends BaseEntity {
   @JoinColumn({ name: 'created_by' })
   createdBy: User;
 
-  @OneToMany(
-    () => StudentSubject,
-    (studentSubject) => studentSubject.subject_id,
-  )
-  studentSubject: StudentSubject[];
+  @Column({ name: 'khoa_id' })
+  khoa_id: number;
+
+  @ManyToOne(() => Faculty)
+  @JoinColumn({ name: 'khoa_id' })
+  khoa: Faculty;
+
+  @OneToMany(() => TopicSemester, (topicSemester) => topicSemester.topic)
+  semesters: TopicSemester[];
+
+  @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.topic_id)
+  studentTopic: StudentTopic[];
 }

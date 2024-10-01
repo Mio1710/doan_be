@@ -7,6 +7,8 @@ import {
   Param,
   UseGuards,
   Put,
+  Req,
+  Query,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateTopicDto } from 'src/dtos';
@@ -25,8 +27,17 @@ export class TopicController {
   ) {}
 
   @Get()
-  async getListTopics(@Res() res) {
-    const data = await this.topicService.getLists();
+  async getListTopics(@Res() res, @Req() req, @Query() query?) {
+    console.log('params', query, req);
+
+    const khoa_id = req.user.khoa_id;
+    const viewAll = query.filter?.viewAll == 'true' ? true : false;
+    const options = { khoa_id, viewAll };
+    if (query?.semester_id) {
+      options['semester_id'] = query.semester_id;
+    }
+
+    const data = await this.topicService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
 

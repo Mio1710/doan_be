@@ -5,3 +5,5 @@ export * from './student.entity';
 export * from './semester.entity';
 export * from './topic.entity';
 export * from './studentSubject.entity';
+export * from './student-topic.entity';
+export * from './topic-semester.entity';
