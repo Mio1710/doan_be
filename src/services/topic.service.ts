@@ -52,7 +52,7 @@ export class TopicService {
 
     // add condition
     query
-      .where('semester.id = :semester_id', { semester_id })
+      .where('semester.semester_id = :semester_id', { semester_id })
       .andWhere('topic.khoa_id = :khoa_id', { khoa_id });
 
     if (!viewAll) {
