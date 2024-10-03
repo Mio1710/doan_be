@@ -111,4 +111,17 @@ export class UserService {
       throw new HttpException(error, 400);
     }
   }
+
+  async updateRole(id, role: string[]): Promise<User> {
+    try {
+      // const options = { where: { id } };
+      const user = await this.useRepository.findOne(id);
+      console.log('user find one nè', user, user.types, role);
+      
+      user.types = role;
+      return await this.useRepository.update(user);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
 }
