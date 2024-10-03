@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Semester, Topic } from '../entities';
+import { Semester, Topic, TopicSemester } from '../entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptions, Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { ListTopicQuery } from 'src/interfaces/queries/listTopic.interface';
 import { SemesterService } from './semester.service';
@@ -15,25 +15,67 @@ export class TopicService {
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>,
 
+    @InjectRepository(TopicSemester)
+    private readonly topicSemesterRepository: Repository<TopicSemester>,
+
     private readonly semesterService: SemesterService,
     private readonly cls: ClsService,
   ) {}
 
   async getLists(options?: ListTopicQuery): Promise<Topic[]> {
     let semester_id = options?.semester_id;
+    const khoa_id = options?.khoa_id;
+    const viewAll = options?.viewAll ?? false;
+    const userID = this.cls.get('userId');
     if (!semester_id) {
       semester_id = await this.semesterService.getActiveSemester();
     }
-    return await this.topicRepository
+    console.log('semester_id', semester_id, khoa_id, options, viewAll);
+
+    // select information
+    const query = this.topicRepository
       .createQueryBuilder('topic')
       .leftJoinAndSelect('topic.createdBy', 'user')
-      .select(['topic', 'user.ten', 'user.hodem', 'user.id'])
-      .where('topic.semester_id = :semester_id', { semester_id })
-      .getMany();
+      .leftJoinAndSelect('topic.khoa', 'khoa')
+      .leftJoinAndSelect('topic.semesters', 'semester')
+      .select([
+        'topic.ten',
+        'topic.description',
+        'topic.requirement',
+        'topic.knowledge',
+        'topic.status',
+        'topic.id',
+        'user.ten',
+        'user.hodem',
+        'user.id',
+      ]);
+
+    // add condition
+    query
+      .where('semester.semester_id = :semester_id', { semester_id })
+      .andWhere('topic.khoa_id = :khoa_id', { khoa_id });
+
+    if (!viewAll) {
+      query.andWhere('topic.created_by = :userID', { userID });
+    }
+
+    return await query.getMany();
   }
 
   async create(topic): Promise<Topic> {
-    return this.topicRepository.save(topic);
+    const data = await this.topicRepository.save(topic);
+
+    // active semester
+    const currentSemester = await this.semesterService.getActiveSemester();
+
+    const topicSemester = await this.topicSemesterRepository.save({
+      topic_id: data.id,
+      semester_id: currentSemester,
+    });
+
+    console.log('topicSemester', topicSemester);
+
+    return data;
   }
 
   async update(id: number, topic: Topic) {

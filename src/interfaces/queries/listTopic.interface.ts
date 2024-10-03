@@ -1,4 +1,5 @@
 export interface ListTopicQuery {
-  faculty_id?: number;
+  khoa_id?: number;
   semester_id?: number;
+  viewAll: boolean;
 }
