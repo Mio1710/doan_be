@@ -28,7 +28,8 @@ export class TopicService {
     const viewAll = options?.viewAll ?? false;
     const userID = this.cls.get('userId');
     if (!semester_id) {
-      semester_id = await this.semesterService.getActiveSemester();
+      const semester = await this.semesterService.getActiveSemester();
+      semester_id = semester.id;
     }
     console.log('semester_id', semester_id, khoa_id, options, viewAll);
 
@@ -70,7 +71,7 @@ export class TopicService {
 
     const topicSemester = await this.topicSemesterRepository.save({
       topic_id: data.id,
-      semester_id: currentSemester,
+      semester_id: currentSemester.id,
     });
 
     console.log('topicSemester', topicSemester);

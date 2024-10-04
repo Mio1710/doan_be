@@ -28,8 +28,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    return this.authServeice.getProfile(req.user);
   }
 
   @Get('init-admin')
@@ -42,7 +42,7 @@ export class AuthController {
       ten: 'admin',
       email: 'admin@iuh.com',
       phone: '0123456789',
-      types: ['super_admin'],
+      roles: ['super_admin'],
       matkhau: '123123123',
     };
 
