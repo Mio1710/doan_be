@@ -58,9 +58,10 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
-  @Get('xxxxx')
-  async getTopicRegistedDetailById(@Res() res) {
-    const data = await this.studentTopicService.activeSemester([], 1);
+  @Post('register')
+  async getTopicRegistedDetailById(@Res() res, @Req() req, @Body() topic) {
+    const userId = req.user.id;
+    const data = await this.studentTopicService.update(userId, topic);
 
     return this.responseUtils.success({ data }, res);
   }

@@ -64,7 +64,10 @@ export class TopicService {
   }
 
   async create(topic): Promise<Topic> {
+    console.log('topic before create', topic);
     const data = await this.topicRepository.save(topic);
+
+    console.log('topic data create', data);
 
     // active semester
     const currentSemester = await this.semesterService.getActiveSemester();

@@ -8,7 +8,7 @@ import { TopicSemester } from './topic-semester.entity';
 
 @Entity('topic')
 export class Topic extends BaseEntity {
-  @Column({ length: 150, type: 'nvarchar' })
+  @Column({ length: 250, type: 'nvarchar' })
   ten: string;
 
   @Column({ length: 1000, type: 'nvarchar', nullable: true })

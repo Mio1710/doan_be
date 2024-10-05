@@ -75,19 +75,28 @@ export class StudentTopicService {
       .execute();
   }
 
-  update(student: Student): Promise<Student> {
-    return this.studentRepository.save(student);
+  async update(studentId: number, data): Promise<StudentTopic> {
+    const studentTopic = await this.findOne({ student_id: studentId });
+    if (data.group_id) {
+      studentTopic.group = data.group;
+    }
+    if (data.topic_id) {
+      studentTopic.topic_id = data.topic_id;
+    }
+    console.log('studentTopic11111', data, studentTopic);
+
+    return await this.studentTopicRepository.save(studentTopic);
   }
 
   delete(id: number) {
     return this.studentRepository.softDelete(id);
   }
 
-  async findOne(options): Promise<Student> {
+  async findOne(options): Promise<StudentTopic> {
     try {
       console.log('options', options);
 
-      const student = await this.studentRepository.findOne({
+      const student = await this.studentTopicRepository.findOne({
         where: { ...options },
       });
       if (!student) {
@@ -154,19 +163,31 @@ export class StudentTopicService {
     };
 
     result.topic = await this.studentTopicRepository
-      .createQueryBuilder('student_topic')
-      .leftJoinAndSelect('student_topic.topic', 'topic')
-      .where('student_topic.student_id = :student_id', { student_id: userId })
+      .createQueryBuilder('student_topics')
+      .select([
+        'student_topics.id',
+        'student_topics.topic_id',
+        'student_topics.semester_id',
+        'topic',
+        'user.ten',
+        'user.hodem',
+      ])
+      .leftJoin('student_topics.topic', 'topic')
+      .leftJoin('topic.createdBy', 'user')
+      .where('student_topics.student_id = :student_id', { student_id: userId })
       .getOne();
 
-    if (result.topic[0]?.id) {
-      result.students = await this.studentTopicRepository
-        .createQueryBuilder('student_topic')
-        .leftJoinAndSelect('student_topic.student', 'student')
-        .where('student_topic.topic_id = :topic_id', {
-          topic_id: result.topic[0].id,
+    if (result.topic.id) {
+      result.students = await this.studentRepository
+        .createQueryBuilder('students')
+        .select(['students'])
+        .leftJoin('students.studentTopic', 'topic')
+        .where('topic.topic_id = :topic_id', {
+          topic_id: result.topic.topic_id,
         })
         .getMany();
+
+      console.log('result', result.students);
     }
     return result;
   }
