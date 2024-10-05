@@ -90,7 +90,7 @@ export class AuthService {
   async getProfile(user) {
     try {
       console.log('userrrrrrrrr', user);
-      
+
       if (user.roles == 'student') {
         const student = await this.studentService.findOne({ id: user.id });
         return { ...student, roles: ['student'] };

@@ -1,10 +1,11 @@
-import { Entity, ManyToOne, JoinColumn, Column } from 'typeorm';
+import { Entity, ManyToOne, JoinColumn, Column, Index } from 'typeorm';
 import { Student } from './student.entity';
 import { Topic } from './topic.entity';
 import { Semester } from './semester.entity';
 import { BaseEntity } from './base.entity';
 
 @Entity('student_topics')
+@Index('IDX_student_semester', ['student_id', 'semester_id'], { unique: true })
 export class StudentTopic extends BaseEntity {
   @Column({ name: 'student_id' })
   student_id: number;
@@ -13,7 +14,7 @@ export class StudentTopic extends BaseEntity {
   @JoinColumn({ name: 'student_id' })
   student: Student;
 
-  @Column({ name: 'topic_id' })
+  @Column({ name: 'topic_id', nullable: true })
   topic_id: number;
 
   @ManyToOne(() => Topic)
@@ -21,11 +22,14 @@ export class StudentTopic extends BaseEntity {
   topic: Topic;
 
   @Column({ type: 'enum', enum: ['new', 'finish', 'fail'], default: 'new' })
-  subject_status: string;
+  status: string;
 
   // auto increment without primary generated
   @Column({ nullable: true })
   group: number;
+
+  @Column({ name: 'semester_id' })
+  semester_id: number;
 
   @ManyToOne(() => Semester)
   @JoinColumn({ name: 'semester_id' })
