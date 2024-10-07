@@ -18,8 +18,6 @@ export class ResponseUtils {
 
   success(response: any, @Res() res: Response) {
     const status_code = response.status_code ?? HttpStatusCode.Ok;
-    console.log('response', response.meta, response, status_code);
-
     const result = {
       status_code,
       data:

@@ -37,7 +37,7 @@ export class CreateUserDTO {
 
   @IsArray()
   @IsOptional()
-  types: string[] = ['teacher'];
+  roles: string[] = ['teacher'];
 }
 
 export class UpdateTeacherDto {
@@ -66,5 +66,5 @@ export class UpdateTeacherDto {
 
   @IsArray()
   @IsOptional()
-  types: string[] = ['teacher'];
+  roles: string[] = ['teacher'];
 }

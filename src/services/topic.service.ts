@@ -28,7 +28,8 @@ export class TopicService {
     const viewAll = options?.viewAll ?? false;
     const userID = this.cls.get('userId');
     if (!semester_id) {
-      semester_id = await this.semesterService.getActiveSemester();
+      const semester = await this.semesterService.getActiveSemester();
+      semester_id = semester.id;
     }
     console.log('semester_id', semester_id, khoa_id, options, viewAll);
 
@@ -63,14 +64,17 @@ export class TopicService {
   }
 
   async create(topic): Promise<Topic> {
+    console.log('topic before create', topic);
     const data = await this.topicRepository.save(topic);
+
+    console.log('topic data create', data);
 
     // active semester
     const currentSemester = await this.semesterService.getActiveSemester();
 
     const topicSemester = await this.topicSemesterRepository.save({
       topic_id: data.id,
-      semester_id: currentSemester,
+      semester_id: currentSemester.id,
     });
 
     console.log('topicSemester', topicSemester);

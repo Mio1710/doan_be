@@ -27,7 +27,7 @@ export class AuthService {
     if (type) {
       console.log('type', type);
       user = await this.usersService.findOne({ maso: maso });
-      typeUser = user.types;
+      typeUser = user.roles;
     } else {
       console.log('type student', type);
       user = await this.studentService.findOne({ maso: maso });
@@ -85,5 +85,20 @@ export class AuthService {
 
   async logout() {
     return;
+  }
+
+  async getProfile(user) {
+    try {
+      console.log('userrrrrrrrr', user);
+
+      if (user.roles == 'student') {
+        const student = await this.studentService.findOne({ id: user.id });
+        return { ...student, roles: ['student'] };
+      } else {
+        return await this.usersService.findOne({ id: user.id });
+      }
+    } catch (error) {
+      throw new HttpException(error.message, error.code ?? 400);
+    }
   }
 }

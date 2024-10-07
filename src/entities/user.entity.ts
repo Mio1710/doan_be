@@ -26,7 +26,7 @@ export class User extends BaseEntity {
   matkhau: string;
 
   @Column({ type: 'json' })
-  types: string[];
+  roles: string[];
 
   @Column({ name: 'khoa_id', nullable: true })
   khoa_id: number;

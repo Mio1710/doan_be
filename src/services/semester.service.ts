@@ -70,13 +70,14 @@ export class SemesterService {
     }
   }
 
-  async getActiveSemester(): Promise<number> {
+  async getActiveSemester(): Promise<Semester> {
     const semester = await this.semesterRepository.findOne({
       where: { status: true },
+      select: ['id', 'ten', 'status'],
     });
     if (!semester) {
       throw new HttpException('Semester not found', 404);
     }
-    return semester.id;
+    return semester;
   }
 }

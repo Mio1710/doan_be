@@ -17,16 +17,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
-import { User } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { UserService } from 'src/services';
 import { ResponseUtils } from 'src/utils/response.util';
-
-@Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
-}
 
 @Controller('teachers')
 @UseGuards(AuthGuard, RolesGuard)
@@ -88,6 +82,16 @@ export class TeacherController {
       );
     }
     const data = await this.userService.import(teachers, khoa_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post(':id/update-role')
+  async updateRole(
+    @Param() id: number,
+    @Body('data') role: string[],
+    @Res() res,
+  ) {
+    const data = await this.userService.updateRole(id, role);
     return this.responseUtils.success({ data }, res);
   }
 }

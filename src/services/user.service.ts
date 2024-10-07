@@ -85,12 +85,12 @@ export class UserService {
             return;
           }
 
-          user.types = ['teacher'];
+          user.roles = ['teacher'];
           if (user.is_super_teacher == 1) {
-            user.types.push('super_teacher');
+            user.roles.push('super_teacher');
           }
           if (user.is_admin == 1) {
-            user.types.push('admin');
+            user.roles.push('admin');
           }
 
           const saltOrRounds = 10;
@@ -108,6 +108,19 @@ export class UserService {
     } catch (error) {
       console.log('error is_super_teacheris_super_teacher', error);
 
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async updateRole(id, role: string[]): Promise<User> {
+    try {
+      // const options = { where: { id } };
+      const user = await this.useRepository.findOne(id);
+      console.log('user find one nè', user, user.roles, role);
+      
+      user.roles = role;
+      return await this.useRepository.update(user);
+    } catch (error) {
       throw new HttpException(error, 400);
     }
   }
