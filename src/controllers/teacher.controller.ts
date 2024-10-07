@@ -41,6 +41,13 @@ export class TeacherController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Get('student-topic')
+  async getStudentTopic(@Res() res, @Req() req) {
+    const teacher_id = req.user.id;
+    const data = await this.userService.getStudentTopic(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
   @Post()
   async createTeacher(@Body() user: CreateUserDTO, @Res() res) {
     const { matkhau, ...data } = await this.userService.create(user);
