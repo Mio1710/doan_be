@@ -78,4 +78,15 @@ export class StudentTopicController {
     const data = await this.studentTopicService.update(userId, topic);
     return this.responseUtils.success({ data }, res);
   }
+
+  @Post('/cancel-group')
+  async cancelGroup(
+    @Res() res,
+    @Body('user_ids') user_ids: number[],
+  ) {
+    console.log('userIds', user_ids);
+
+    const data = await this.studentTopicService.cancelGroup(user_ids);
+    return this.responseUtils.success({ data }, res);
+  }
 }

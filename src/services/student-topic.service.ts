@@ -80,6 +80,10 @@ export class StudentTopicService {
 
     studentTopic.partner_id = data.partner_id;
     studentTopic.topic_id = data.topic_id;
+    if (data.user_ids) {
+      // cancel group
+      await this.cancelGroup(data.user_ids);
+    }
 
     console.log('studentTopic11111', data, studentTopic);
 
@@ -207,9 +211,21 @@ export class StudentTopicService {
           'student.id',
         ])
         .leftJoin('student_topics.student', 'student')
-        .where('student_topics.student_id IN (:...studentIds)', { studentIds })
+        .where(
+          '(student_topics.student_id IN (:...studentIds) or student_topics.partner_id IN (:...studentIds))',
+          { studentIds },
+        )
         .getMany();
     }
     return result;
+  }
+
+  async cancelGroup(user_ids: number[]) {
+    return await this.studentTopicRepository
+      .createQueryBuilder()
+      .update(StudentTopic)
+      .set({ partner_id: null })
+      .where('student_id IN (:...user_ids)', { user_ids })
+      .execute();
   }
 }
