@@ -1,22 +1,25 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { User } from 'src/entities';
+import { Student, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
+import { SemesterService } from './semester.service';
+import { StudentService } from './student.service';
 
 // manage teacher/admin
 // need exclude password field
 
 @Injectable()
 export class UserService {
-  private useRepository: UserRepository;
-  constructor(userRepository: UserRepository) {
-    this.useRepository = userRepository;
-  }
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly semesterService: SemesterService,
+    private readonly studentService: StudentService,
+  ) {}
 
   getLists(options): Promise<User[]> {
-    return this.useRepository.findAll(options);
+    return this.userRepository.findAll(options);
   }
 
   async create(user: CreateUserDTO): Promise<User> {
@@ -30,12 +33,12 @@ export class UserService {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(user.matkhau, saltOrRounds);
     user.matkhau = hash;
-    return this.useRepository.create(user);
+    return this.userRepository.create(user);
   }
 
   async update(user: UpdateTeacherDto): Promise<User> {
     try {
-      return await this.useRepository.update(user);
+      return await this.userRepository.update(user);
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -43,10 +46,10 @@ export class UserService {
 
   async delete(id): Promise<User> {
     try {
-      const user = await this.useRepository.findOne(id);
+      const user = await this.userRepository.findOne(id);
       console.log('user', user);
 
-      return await this.useRepository.delete(user);
+      return await this.userRepository.delete(user);
     } catch (error) {
       throw new HttpException(error, error.status);
     }
@@ -56,7 +59,7 @@ export class UserService {
     try {
       console.log('options', options);
 
-      const user = await this.useRepository.findOne(options);
+      const user = await this.userRepository.findOne(options);
       console.log('check user findone', user);
 
       if (!user) {
@@ -69,7 +72,7 @@ export class UserService {
   }
 
   checkExistUser(maso: string): Promise<User> {
-    return this.useRepository.findOne({ maso });
+    return this.userRepository.findOne({ maso });
   }
 
   async import(file, khoa_id: number): Promise<User[]> {
@@ -100,7 +103,7 @@ export class UserService {
           // add khoa_id
           user.khoa_id = khoa_id;
 
-          return await this.useRepository.create(user);
+          return await this.userRepository.create(user);
         }),
       );
 
@@ -115,11 +118,31 @@ export class UserService {
   async updateRole(id, role: string[]): Promise<User> {
     try {
       // const options = { where: { id } };
-      const user = await this.useRepository.findOne(id);
+      const user = await this.userRepository.findOne(id);
       console.log('user find one nè', user, user.roles, role);
-      
+
       user.roles = role;
-      return await this.useRepository.update(user);
+      return await this.userRepository.update(user);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async getStudentTopic(teacher_id: number): Promise<Student[]> {
+    try {
+      const activeSemester = await this.semesterService.getActiveSemester();
+      const options = {
+        select: ['id', 'maso', 'hodem', 'ten', 'email', 'lop'],
+        where: {
+          studentTopic: {
+            semester_id: activeSemester.id,
+            topic: {
+              createdBy: { id: teacher_id },
+            },
+          },
+        },
+      };
+      return await this.studentService.getLists(options);
     } catch (error) {
       throw new HttpException(error, 400);
     }

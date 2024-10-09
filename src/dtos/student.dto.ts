@@ -52,3 +52,11 @@ export class UpdateStudentDto {
   @IsOptional()
   lop?: string;
 }
+
+export class UpdateStudentTopicDto {
+  @IsOptional()
+  partner_id?: number;
+
+  @IsOptional()
+  topic_id?: number;
+}

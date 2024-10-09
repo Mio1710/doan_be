@@ -11,7 +11,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateStudentDto } from 'src/dtos';
+import { CreateStudentDto, UpdateStudentTopicDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { SemesterService, StudentTopicService } from 'src/services';
@@ -63,6 +63,30 @@ export class StudentTopicController {
     const userId = req.user.id;
     const data = await this.studentTopicService.update(userId, topic);
 
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post('topic')
+  async updateTopic(
+    @Res() res,
+    @Req() req,
+    @Body() topic: UpdateStudentTopicDto,
+  ) {
+    const userId = req.user.id;
+    console.log('check data update', topic, userId, topic.topic_id);
+
+    const data = await this.studentTopicService.update(userId, topic);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post('/cancel-group')
+  async cancelGroup(
+    @Res() res,
+    @Body('user_ids') user_ids: number[],
+  ) {
+    console.log('userIds', user_ids);
+
+    const data = await this.studentTopicService.cancelGroup(user_ids);
     return this.responseUtils.success({ data }, res);
   }
 }

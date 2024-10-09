@@ -77,12 +77,14 @@ export class StudentTopicService {
 
   async update(studentId: number, data): Promise<StudentTopic> {
     const studentTopic = await this.findOne({ student_id: studentId });
-    if (data.group_id) {
-      studentTopic.group = data.group;
+
+    studentTopic.partner_id = data.partner_id;
+    studentTopic.topic_id = data.topic_id;
+    if (data.user_ids) {
+      // cancel group
+      await this.cancelGroup(data.user_ids);
     }
-    if (data.topic_id) {
-      studentTopic.topic_id = data.topic_id;
-    }
+
     console.log('studentTopic11111', data, studentTopic);
 
     return await this.studentTopicRepository.save(studentTopic);
@@ -160,6 +162,7 @@ export class StudentTopicService {
     const result = {
       topic: null,
       students: [],
+      partner: null,
     };
 
     result.topic = await this.studentTopicRepository
@@ -168,6 +171,7 @@ export class StudentTopicService {
         'student_topics.id',
         'student_topics.topic_id',
         'student_topics.semester_id',
+        'student_topics.partner_id',
         'topic',
         'user.ten',
         'user.hodem',
@@ -188,7 +192,40 @@ export class StudentTopicService {
         .getMany();
 
       console.log('result', result.students);
+      // get partner
+      const studentIds = [userId];
+      if (result.topic.partner_id) {
+        studentIds.push(result.topic.partner_id);
+      }
+      result.partner = await this.studentTopicRepository
+        .createQueryBuilder('student_topics')
+        .select([
+          'student_topics.id',
+          'student_topics.student_id',
+          'student_topics.partner_id',
+          'student.hodem',
+          'student.ten',
+          'student.maso',
+          'student.email',
+          'student.lop',
+          'student.id',
+        ])
+        .leftJoin('student_topics.student', 'student')
+        .where(
+          '(student_topics.student_id IN (:...studentIds) or student_topics.partner_id IN (:...studentIds))',
+          { studentIds },
+        )
+        .getMany();
     }
     return result;
+  }
+
+  async cancelGroup(user_ids: number[]) {
+    return await this.studentTopicRepository
+      .createQueryBuilder()
+      .update(StudentTopic)
+      .set({ partner_id: null })
+      .where('student_id IN (:...user_ids)', { user_ids })
+      .execute();
   }
 }

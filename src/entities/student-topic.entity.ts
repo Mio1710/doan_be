@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, JoinColumn, Column, Index, OneToMany } from 'typeorm';
+import { Entity, ManyToOne, JoinColumn, Column, Index, OneToMany, OneToOne } from 'typeorm';
 import { Student } from './student.entity';
 import { Topic } from './topic.entity';
 import { Semester } from './semester.entity';
@@ -26,7 +26,11 @@ export class StudentTopic extends BaseEntity {
 
   // auto increment without primary generated
   @Column({ nullable: true })
-  group: number;
+  partner_id: number;
+
+  @OneToOne(() => Student)
+  @JoinColumn({ name: 'partner_id' })
+  partner: Student;
 
   @Column({ name: 'semester_id' })
   semester_id: number;
