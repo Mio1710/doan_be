@@ -51,11 +51,16 @@ export class StudentTopicController {
   }
 
   @Get('registed')
-  async getTopicRegistedDetail(@Res() res) {
-    const data = await this.studentTopicService.getRegistedDetail();
-    console.log('topic data', data);
+  async getTopicRegistedDetail(@Res() res, @Req() req) {
+    try {
+      const userId = req.user.id;
+      const data = await this.studentTopicService.getRegistedDetail(userId);
+      console.log('topic data', data);
 
-    return this.responseUtils.success({ data }, res);
+      return this.responseUtils.success({ data }, res);
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 
   @Post('register')
@@ -82,11 +87,13 @@ export class StudentTopicController {
   @Post('/cancel-group')
   async cancelGroup(
     @Res() res,
-    @Body('user_ids') user_ids: number[],
+    @Body('user_ids') partnerId: number,
+    @Req() req,
   ) {
-    console.log('userIds', user_ids);
+    const userId = req.user.id;
+    console.log('userIds', userId);
 
-    const data = await this.studentTopicService.cancelGroup(user_ids);
+    const data = await this.studentTopicService.cancelGroup(userId, partnerId);
     return this.responseUtils.success({ data }, res);
   }
 }

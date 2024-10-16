@@ -3,12 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FacultyDto } from 'src/dtos';
 import { Faculty } from 'src/entities';
 import { Repository } from 'typeorm';
+import { StudentTopicService } from './student-topic.service';
+import { SemesterService } from './semester.service';
 
 @Injectable()
 export class FacultyService {
   constructor(
     @InjectRepository(Faculty)
     private readonly facultyRepository: Repository<Faculty>,
+
+    private readonly studentTopicService: StudentTopicService,
+    private readonly semesterService: SemesterService,
   ) {}
 
   async getLists(): Promise<Faculty[]> {

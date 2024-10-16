@@ -7,3 +7,4 @@ export * from './topic.entity';
 export * from './studentSubject.entity';
 export * from './student-topic.entity';
 export * from './topic-semester.entity';
+export * from './group.entity';
