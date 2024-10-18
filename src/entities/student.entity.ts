@@ -40,6 +40,6 @@ export class Student extends BaseEntity {
   @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.student)
   studentTopic: StudentTopic[];
 
-  @ManyToOne(() => Group, (group) => group.firstPartner)
+  @ManyToOne(() => Group)
   group: Group;
 }

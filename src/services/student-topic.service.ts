@@ -107,7 +107,7 @@ export class StudentTopicService {
       }
       if (data.user_ids) {
         // cancel group
-        await this.cancelGroup(studentId, data.partner_id);
+        await this.cancelGroup(studentId);
       }
 
       console.log('studentTopic11111', data, studentTopic);
@@ -226,8 +226,9 @@ export class StudentTopicService {
       if (result.topic.id) {
         result.students = await this.studentRepository
           .createQueryBuilder('students')
-          .select(['students'])
+          .select(['students', 'group'])
           .leftJoin('students.studentTopic', 'topic')
+          .leftJoin('topic.group', 'group')
           .where('topic.topic_id = :topic_id', {
             topic_id: result.topic.topic_id,
           })
@@ -264,24 +265,85 @@ export class StudentTopicService {
     }
   }
 
-  async cancelGroup(studentId: number, partnerId: number) {
+  async cancelGroup(studentId: number) {
+    // get group info
+    const group = await this.getGroupByStudentId(studentId);
+
+    if (!group || !group.first_partner_id || !group.second_partner_id) {
+      throw new HttpException('Bad Request', 400);
+    }
+    const partnerId =
+      group.first_partner_id === studentId
+        ? group.second_partner_id
+        : group.first_partner_id;
+
+    console.log('partnerId', partnerId);
+
     // set second_partner_id = null for partner and set first_partner_id = partnerId
     await this.groupRepository
       .createQueryBuilder()
       .update(Group)
       .set({ firstPartner: { id: partnerId }, secondPartner: null })
-      .where('first_partner_id IN (:...userIds)', {
-        userIds: [studentId, partnerId],
+      .where('id = :id', {
+        id: group.id,
       })
       .execute();
+
     // set group_id = null for student excute cancel group
     await this.studentTopicRepository
       .createQueryBuilder()
       .update(StudentTopic)
       .set({ group_id: null })
-      .where('student_id = :studentId', { studentId })
+      .where('student_id IN (:...studentId)', {
+        studentId: [studentId, partnerId],
+      })
       .execute();
 
     return true;
+  }
+
+  async createGroup(studentId: number, partnerId: number) {
+    // check if student already in group
+    const groupExist = await this.getGroupByStudentId(studentId);
+    console.log('groupExistgroupExistgroupExist', groupExist, studentId);
+
+    if (groupExist?.first_partner_id && groupExist?.second_partner_id) {
+      throw new HttpException('Bad Request', 400);
+    }
+    // check if partner already in group
+    const groupExistPartner = await this.getGroupByStudentId(partnerId);
+    if (
+      groupExistPartner?.first_partner_id &&
+      groupExistPartner?.second_partner_id
+    ) {
+      throw new HttpException('Bad Request', 400);
+    }
+    const group: Group = groupExist || groupExistPartner || new Group();
+
+    group.first_partner_id = studentId;
+    group.second_partner_id = partnerId;
+
+    const newGroup = await this.groupRepository.save(group);
+    this.studentTopicRepository
+      .createQueryBuilder()
+      .update(StudentTopic)
+      .set({ group_id: newGroup.id })
+      .where('student_id IN (:...studentId)', {
+        studentId: [studentId, partnerId],
+      })
+      .execute();
+
+    return true;
+  }
+
+  async getGroupByStudentId(studentId: number) {
+    return this.groupRepository
+      .createQueryBuilder('group')
+      .select(['group.id', 'group.first_partner_id', 'group.second_partner_id'])
+      .where(
+        'group.first_partner_id = :studentId or group.second_partner_id  = :studentId',
+        { studentId },
+      )
+      .getOne();
   }
 }
