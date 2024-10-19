@@ -7,3 +7,4 @@ export * from './student-topic.controller';
 export * from './topic.controller';
 export * from './super-admin.controller';
 export * from './super-teacher.controller';
+export * from './lo.controller';

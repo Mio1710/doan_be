@@ -1,7 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
-import { Semester } from './semester.entity';
 import { StudentTopic } from './student-topic.entity';
 import { Faculty } from './faculty.entity';
 import { TopicSemester } from './topic-semester.entity';
