@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Semester, Student, Topic } from 'src/entities';
+import { Semester, Student } from 'src/entities';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { StudentSubject } from 'src/entities/studentSubject.entity';
-import { ListTopicQuery } from 'src/interfaces/queries/listTopic.interface';
 
 @Injectable()
 export class StudentService {

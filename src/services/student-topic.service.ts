@@ -28,11 +28,36 @@ export class StudentTopicService {
   async getLists(khoa_id, params): Promise<Student[]> {
     const semester = await this.semesterService.getActiveSemester();
     const options = {
+      select: {
+        id: true,
+        maso: true,
+        hodem: true,
+        ten: true,
+        email: true,
+        lop: true,
+        studentTopic: {
+          group_id: true,
+          topic: {
+            ten: true,
+            teacher: {
+              hodem: true,
+              ten: true,
+            },
+          },
+        },
+      },
       where: {
         khoa_id,
         studentTopic: {
           status: 'new',
           semester: { id: semester.id },
+        },
+      },
+      relations: {
+        studentTopic: {
+          topic: {
+            teacher: true,
+          },
         },
       },
     };
@@ -226,7 +251,7 @@ export class StudentTopicService {
       if (result.topic.id) {
         result.students = await this.studentRepository
           .createQueryBuilder('students')
-          .select(['students', 'group'])
+          .select(['students', 'topic.group_id'])
           .leftJoin('students.studentTopic', 'topic')
           .leftJoin('topic.group', 'group')
           .where('topic.topic_id = :topic_id', {
@@ -308,7 +333,7 @@ export class StudentTopicService {
     console.log('groupExistgroupExistgroupExist', groupExist, studentId);
 
     if (groupExist?.first_partner_id && groupExist?.second_partner_id) {
-      throw new HttpException('Bad Request', 400);
+      throw new HttpException('Sinh viên đã có nhóm. Vui lòng thử lại', 400);
     }
     // check if partner already in group
     const groupExistPartner = await this.getGroupByStudentId(partnerId);
@@ -316,7 +341,7 @@ export class StudentTopicService {
       groupExistPartner?.first_partner_id &&
       groupExistPartner?.second_partner_id
     ) {
-      throw new HttpException('Bad Request', 400);
+      throw new HttpException('Sinh viên đã có nhóm. Vui lòng thử lại', 400);
     }
     const group: Group = groupExist || groupExistPartner || new Group();
 
