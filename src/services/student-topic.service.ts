@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Semester, Student, StudentTopic, Topic } from 'src/entities';
+import { Group, Student, StudentTopic } from 'src/entities';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
@@ -17,6 +17,9 @@ export class StudentTopicService {
     @InjectRepository(StudentTopic)
     private readonly studentTopicRepository: Repository<StudentTopic>,
 
+    @InjectRepository(Group)
+    private readonly groupRepository: Repository<Group>,
+
     private readonly cls: ClsService,
 
     private readonly semesterService: SemesterService,
@@ -25,6 +28,24 @@ export class StudentTopicService {
   async getLists(khoa_id, params): Promise<Student[]> {
     const semester = await this.semesterService.getActiveSemester();
     const options = {
+      select: {
+        id: true,
+        maso: true,
+        hodem: true,
+        ten: true,
+        email: true,
+        lop: true,
+        studentTopic: {
+          group_id: true,
+          topic: {
+            ten: true,
+            teacher: {
+              hodem: true,
+              ten: true,
+            },
+          },
+        },
+      },
       where: {
         khoa_id,
         studentTopic: {
@@ -32,10 +53,21 @@ export class StudentTopicService {
           semester: { id: semester.id },
         },
       },
+      relations: {
+        studentTopic: {
+          topic: {
+            teacher: true,
+          },
+        },
+      },
     };
     console.log('options1111', options, params);
 
     return this.studentRepository.find({ ...options });
+  }
+
+  async find(options): Promise<StudentTopic[]> {
+    return this.studentTopicRepository.find(options);
   }
 
   async create(student) {
@@ -76,17 +108,42 @@ export class StudentTopicService {
   }
 
   async update(studentId: number, data): Promise<StudentTopic> {
-    const studentTopic = await this.findOne({ student_id: studentId });
+    try {
+      const studentTopic = await this.findOne({ student_id: studentId });
 
-    studentTopic.partner_id = data.partner_id;
-    studentTopic.topic_id = data.topic_id;
-    if (data.user_ids) {
-      // cancel group
-      await this.cancelGroup(data.user_ids);
+      const getPartnerTopic = await this.studentTopicRepository.findOne({
+        where: { student_id: data.partner_id },
+      });
+      studentTopic.topic_id = data.topic_id;
+      if (data.partner_id) {
+        const group = {
+          firstPartner: { id: studentId },
+          secondPartner: { id: getPartnerTopic.id },
+        };
+        const newGroup = await this.groupRepository.save(group);
+        this.studentTopicRepository
+          .createQueryBuilder()
+          .update(StudentTopic)
+          .set({ group_id: newGroup.id })
+          .where('student_id IN (:...studentId)', {
+            studentId: [studentId, data.partner_id],
+          })
+          .execute();
+      }
+      if (data.user_ids) {
+        // cancel group
+        await this.cancelGroup(studentId);
+      }
+
+      console.log('studentTopic11111', data, studentTopic);
+
+      return await this.studentTopicRepository.save(studentTopic);
+    } catch (error) {
+      throw new HttpException(error, 400);
     }
+  }
 
-    console.log('studentTopic11111', data, studentTopic);
-
+  async save(studentTopic: StudentTopic[]): Promise<StudentTopic[]> {
     return await this.studentTopicRepository.save(studentTopic);
   }
 
@@ -157,75 +214,161 @@ export class StudentTopicService {
     }
   }
 
-  async getRegistedDetail() {
-    const userId = this.cls.get('userId');
-    const result = {
-      topic: null,
-      students: [],
-      partner: null,
-    };
+  async getRegistedDetail(userId: number) {
+    try {
+      const activeSemester = await this.semesterService.getActiveSemester();
+      const result = {
+        topic: null,
+        students: [],
+        partner: null,
+      };
 
-    result.topic = await this.studentTopicRepository
-      .createQueryBuilder('student_topics')
-      .select([
-        'student_topics.id',
-        'student_topics.topic_id',
-        'student_topics.semester_id',
-        'student_topics.partner_id',
-        'topic',
-        'user.ten',
-        'user.hodem',
-      ])
-      .leftJoin('student_topics.topic', 'topic')
-      .leftJoin('topic.createdBy', 'user')
-      .where('student_topics.student_id = :student_id', { student_id: userId })
-      .getOne();
-
-    if (result.topic.id) {
-      result.students = await this.studentRepository
-        .createQueryBuilder('students')
-        .select(['students'])
-        .leftJoin('students.studentTopic', 'topic')
-        .where('topic.topic_id = :topic_id', {
-          topic_id: result.topic.topic_id,
-        })
-        .getMany();
-
-      console.log('result', result.students);
-      // get partner
-      const studentIds = [userId];
-      if (result.topic.partner_id) {
-        studentIds.push(result.topic.partner_id);
-      }
-      result.partner = await this.studentTopicRepository
+      result.topic = await this.studentTopicRepository
         .createQueryBuilder('student_topics')
         .select([
           'student_topics.id',
-          'student_topics.student_id',
-          'student_topics.partner_id',
-          'student.hodem',
-          'student.ten',
-          'student.maso',
-          'student.email',
-          'student.lop',
-          'student.id',
+          'student_topics.topic_id',
+          'student_topics.semester_id',
+          'student_topics.group_id',
+          'topic',
+          'user.ten',
+          'user.hodem',
+          'group.id',
+          'group.first_partner_id',
+          'group.second_partner_id',
         ])
-        .leftJoin('student_topics.student', 'student')
-        .where(
-          '(student_topics.student_id IN (:...studentIds) or student_topics.partner_id IN (:...studentIds))',
-          { studentIds },
-        )
-        .getMany();
+        .leftJoin('student_topics.topic', 'topic')
+        .leftJoin('topic.createdBy', 'user')
+        .leftJoin('student_topics.group', 'group')
+        .where('student_topics.student_id = :student_id', {
+          student_id: userId,
+        })
+        .andWhere('student_topics.semester_id = :semester_id', {
+          semester_id: activeSemester.id,
+        })
+        .getOne();
+
+      if (result.topic.id) {
+        result.students = await this.studentRepository
+          .createQueryBuilder('students')
+          .select(['students', 'topic.group_id'])
+          .leftJoin('students.studentTopic', 'topic')
+          .leftJoin('topic.group', 'group')
+          .where('topic.topic_id = :topic_id', {
+            topic_id: result.topic.topic_id,
+          })
+          .andWhere('topic.semester_id = :semester_id', {
+            semester_id: activeSemester.id,
+          })
+          .getMany();
+
+        console.log('result', result.students);
+        // get partner
+        if (result.topic.group_id) {
+          const partnerIds = [
+            result.topic.group.first_partner_id,
+            result.topic.group.second_partner_id,
+          ];
+          result.partner = await this.studentRepository
+            .createQueryBuilder('students')
+            .select([
+              'students.id',
+              'students.maso',
+              'students.hodem',
+              'students.ten',
+              'students.lop',
+            ])
+            .where('id in (:...userIds)', { userIds: partnerIds })
+            .getMany();
+        }
+      }
+      return result;
+    } catch (error) {
+      console.log('error is_super_teacheris_super_teacher', error);
+
+      throw new HttpException(error, 400);
     }
-    return result;
   }
 
-  async cancelGroup(user_ids: number[]) {
-    return await this.studentTopicRepository
+  async cancelGroup(studentId: number) {
+    // get group info
+    const group = await this.getGroupByStudentId(studentId);
+
+    if (!group || !group.first_partner_id || !group.second_partner_id) {
+      throw new HttpException('Bad Request', 400);
+    }
+    const partnerId =
+      group.first_partner_id === studentId
+        ? group.second_partner_id
+        : group.first_partner_id;
+
+    console.log('partnerId', partnerId);
+
+    // set second_partner_id = null for partner and set first_partner_id = partnerId
+    await this.groupRepository
+      .createQueryBuilder()
+      .update(Group)
+      .set({ firstPartner: { id: partnerId }, secondPartner: null })
+      .where('id = :id', {
+        id: group.id,
+      })
+      .execute();
+
+    // set group_id = null for student excute cancel group
+    await this.studentTopicRepository
       .createQueryBuilder()
       .update(StudentTopic)
-      .set({ partner_id: null })
-      .where('student_id IN (:...user_ids)', { user_ids })
+      .set({ group_id: null })
+      .where('student_id IN (:...studentId)', {
+        studentId: [studentId, partnerId],
+      })
       .execute();
+
+    return true;
+  }
+
+  async createGroup(studentId: number, partnerId: number) {
+    // check if student already in group
+    const groupExist = await this.getGroupByStudentId(studentId);
+    console.log('groupExistgroupExistgroupExist', groupExist, studentId);
+
+    if (groupExist?.first_partner_id && groupExist?.second_partner_id) {
+      throw new HttpException('Sinh viên đã có nhóm. Vui lòng thử lại', 400);
+    }
+    // check if partner already in group
+    const groupExistPartner = await this.getGroupByStudentId(partnerId);
+    if (
+      groupExistPartner?.first_partner_id &&
+      groupExistPartner?.second_partner_id
+    ) {
+      throw new HttpException('Sinh viên đã có nhóm. Vui lòng thử lại', 400);
+    }
+    const group: Group = groupExist || groupExistPartner || new Group();
+
+    group.first_partner_id = studentId;
+    group.second_partner_id = partnerId;
+
+    const newGroup = await this.groupRepository.save(group);
+    this.studentTopicRepository
+      .createQueryBuilder()
+      .update(StudentTopic)
+      .set({ group_id: newGroup.id })
+      .where('student_id IN (:...studentId)', {
+        studentId: [studentId, partnerId],
+      })
+      .execute();
+
+    return true;
+  }
+
+  async getGroupByStudentId(studentId: number) {
+    return this.groupRepository
+      .createQueryBuilder('group')
+      .select(['group.id', 'group.first_partner_id', 'group.second_partner_id'])
+      .where(
+        'group.first_partner_id = :studentId or group.second_partner_id  = :studentId',
+        { studentId },
+      )
+      .getOne();
   }
 }

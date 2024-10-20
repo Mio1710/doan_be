@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { SemesterService } from './semester.service';
 import { StudentService } from './student.service';
+import { group } from 'console';
 
 // manage teacher/admin
 // need exclude password field
@@ -132,13 +133,31 @@ export class UserService {
     try {
       const activeSemester = await this.semesterService.getActiveSemester();
       const options = {
-        select: ['id', 'maso', 'hodem', 'ten', 'email', 'lop'],
+        select: {
+          id: true,
+          maso: true,
+          hodem: true,
+          ten: true,
+          email: true,
+          lop: true,
+          studentTopic: {
+            group_id: true,
+            topic: {
+              ten: true,
+            },
+          },
+        },
         where: {
           studentTopic: {
             semester_id: activeSemester.id,
             topic: {
               createdBy: { id: teacher_id },
             },
+          },
+        },
+        relations: {
+          studentTopic: {
+            topic: true,
           },
         },
       };
