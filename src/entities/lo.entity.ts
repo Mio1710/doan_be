@@ -1,6 +1,7 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Faculty } from './faculty.entity';
+import { LOStudentTopic } from './lo-student-topic.entity';
 
 @Entity('los')
 export class LO extends BaseEntity {
@@ -22,4 +23,7 @@ export class LO extends BaseEntity {
 
   @Column({ name: 'khoa_id', nullable: true })
   khoa_id: number;
+
+  @OneToOne(() => LOStudentTopic, (loStudentTopic) => loStudentTopic.lo)
+  loStudentTopic: LOStudentTopic;
 }

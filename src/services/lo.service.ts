@@ -40,4 +40,14 @@ export class LOService {
       throw new HttpException(error, 400);
     }
   }
+
+  async getStudentResult(student_id) {
+    try {
+      const studentTopic = { student_id };
+
+      return studentTopic;
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
 }

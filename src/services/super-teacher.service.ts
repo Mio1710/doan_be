@@ -40,6 +40,7 @@ export class SuperTeacherService {
           'topic.id',
           'topic.ten',
           'studentTopic.semester_id',
+          'studentTopic.group_id',
         ])
         .getMany();
 
