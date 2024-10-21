@@ -1,22 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Req,
-  Res,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-  // UsePipes,
-  // ValidationPipe,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
-import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { SuperTeacherService } from 'src/services';

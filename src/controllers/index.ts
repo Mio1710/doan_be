@@ -9,3 +9,4 @@ export * from './super-admin.controller';
 export * from './super-teacher.controller';
 export * from './lo.controller';
 export * from './result.controller';
+export * from './admin.controller';

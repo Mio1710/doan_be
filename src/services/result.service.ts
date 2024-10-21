@@ -73,14 +73,28 @@ export class ResultService {
   }
 
   async getStudentResultLO(student_id) {
-    console.log('student_id1111', student_id);
+    if (!student_id) {
+      throw new HttpException('Student id is required', 400);
+    }
+    const student_topic = await this.getStudentResult(student_id);
 
     try {
       const result = await this.LORepository.createQueryBuilder('lo')
-        .leftJoinAndSelect('lo.loStudentTopic', 'loStudentTopic')
-        .where('loStudentTopic.student_topic_id = :student_id', { student_id })
-        .select(['lo.id', 'lo.main_criteria', 'loStudentTopic.score'])
-        .getMany();
+        .leftJoinAndSelect(
+          'lo_student_topics',
+          'lst',
+          'lo.id = lst.lo_id AND lst.student_topic_id = :studentTopicId',
+          { studentTopicId: student_topic.id },
+        )
+        .select([
+          'lo.id as id',
+          'lo.main_criteria as main_criteria',
+          'lo.sub_criteria as sub_criteria',
+          'lo.cof as cof',
+          'lst.score as score',
+          `${student_topic.id} as student_topic_id`,
+        ])
+        .getRawMany();
 
       return result;
     } catch (error) {
