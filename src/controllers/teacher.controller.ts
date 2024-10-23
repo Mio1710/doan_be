@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Query, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { query } from 'express';
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -35,9 +45,16 @@ export class TeacherController {
   @Get('student-results-lo')
   async getStudentResultsLO(@Res() res, @Query() query) {
     const studentId = query.studentId;
-    console.log('studentId222', studentId, query);
-
     const data = await this.resultService.getStudentResultLO(studentId);
+    console.log('lo data', data);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('student-results-lo')
+  async updateStudentResultsLO(@Res() res, @Body() body) {
+    console.log('body', body);
+
+    const data = await this.resultService.updateStudentResultLO(body);
     console.log('lo data', data);
     return this.responseUtils.success({ data }, res);
   }

@@ -87,16 +87,63 @@ export class ResultService {
           { studentTopicId: student_topic.id },
         )
         .select([
-          'lo.id as id',
+          'lo.id as lo_id',
           'lo.main_criteria as main_criteria',
           'lo.sub_criteria as sub_criteria',
           'lo.cof as cof',
           'lst.score as score',
+          'lst.id as id',
           `${student_topic.id} as student_topic_id`,
         ])
+        .orderBy('lo.id')
         .getRawMany();
 
       return result;
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async updateStudentResultLO(listResult = []) {
+    const studentId = listResult[0].student_topic_id;
+
+    const dataCreate = listResult.filter((item) => !item.id && item.score);
+    const dataUpdate = listResult.filter((item) => item.id && item.score);
+    const dataDelete = listResult.filter((item) => item.id && !item.score);
+    const dataDeleteId = dataDelete.map((item) => item.id);
+
+    try {
+      await this.loStudentTopicRepository
+        .createQueryBuilder('lo_student_topics')
+        .insert()
+        .into(LOStudentTopic)
+        .values(
+          dataCreate.map((item) => ({
+            student_topic: { id: studentId },
+            lo: { id: item.lo_id },
+            score: item.score,
+          })),
+        )
+        .execute();
+
+      dataUpdate.forEach(async (item) => {
+        await this.loStudentTopicRepository
+          .createQueryBuilder('lo_student_topics')
+          .update(LOStudentTopic)
+          .set({ score: item.score })
+          .where('id = :id', { id: item.id })
+          .execute();
+      });
+
+      if (dataDeleteId.length) {
+        await this.loStudentTopicRepository
+          .createQueryBuilder('lo_student_topics')
+          .delete()
+          .from(LOStudentTopic)
+          .where('id IN (:...ids)', { ids: dataDeleteId })
+          .execute();
+      }
+      return true;
     } catch (error) {
       throw new HttpException(error, 400);
     }
