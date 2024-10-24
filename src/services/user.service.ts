@@ -141,6 +141,7 @@ export class UserService {
           email: true,
           lop: true,
           studentTopic: {
+            id: true,
             group_id: true,
             topic: {
               ten: true,
@@ -151,7 +152,7 @@ export class UserService {
           studentTopic: {
             semester_id: activeSemester.id,
             topic: {
-              createdBy: { id: teacher_id },
+              teacher: { id: teacher_id },
             },
           },
         },

@@ -2,14 +2,12 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Put,
   Query,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { query } from 'express';
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';

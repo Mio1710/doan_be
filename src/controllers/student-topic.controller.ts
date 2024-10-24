@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateStudentDto, UpdateStudentTopicDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import {  StudentTopicService } from 'src/services';
+import { StudentTopicService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 
 @UseGuards(AuthGuard, RolesGuard)
