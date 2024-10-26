@@ -5,3 +5,4 @@ export * from './student.dto';
 export * from './semester.dto';
 export * from './topic.dto';
 export * from './lo.dto';
+export * from './teacher-group.dto';

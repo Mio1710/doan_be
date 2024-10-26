@@ -8,3 +8,4 @@ export * from './student-topic.service';
 export * from './super-teacher.service';
 export * from './lo.service';
 export * from './result.service';
+export * from './teacher-group.service';

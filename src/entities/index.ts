@@ -10,3 +10,5 @@ export * from './topic-semester.entity';
 export * from './group.entity';
 export * from './lo.entity';
 export * from './lo-student-topic.entity';
+export * from './teacher_group.entity';
+export * from './teacher_group_member.entity';

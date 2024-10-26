@@ -1,6 +1,8 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
+import { TeacherGroup } from './teacher_group.entity';
+import { TeacherGroupMember } from './teacher_group_member.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -37,4 +39,10 @@ export class User extends BaseEntity {
 
   is_super_teacher?: number;
   is_admin?: number;
+
+  @OneToMany(
+    () => TeacherGroupMember,
+    (teacherGroupMember) => teacherGroupMember.teacher,
+  )
+  teacher_group_members: TeacherGroupMember[];
 }
