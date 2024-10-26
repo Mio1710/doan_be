@@ -36,7 +36,7 @@ export class TopicService {
     // select information
     const query = this.topicRepository
       .createQueryBuilder('topic')
-      .leftJoinAndSelect('topic.createdBy', 'user')
+      .leftJoinAndSelect('topic.teacher', 'user')
       .leftJoinAndSelect('topic.khoa', 'khoa')
       .leftJoinAndSelect('topic.semesters', 'semester')
       .select([
@@ -58,6 +58,11 @@ export class TopicService {
 
     if (!viewAll) {
       query.andWhere('topic.created_by = :userID', { userID });
+    }
+    if (options?.status) {
+      query.andWhere('topic.status IN (:...status)', {
+        status: options.status,
+      });
     }
 
     return await query.getMany();

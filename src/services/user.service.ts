@@ -6,7 +6,6 @@ import * as XLSX from 'xlsx';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { SemesterService } from './semester.service';
 import { StudentService } from './student.service';
-import { group } from 'console';
 
 // manage teacher/admin
 // need exclude password field

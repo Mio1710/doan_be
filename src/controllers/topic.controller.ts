@@ -28,13 +28,18 @@ export class TopicController {
 
   @Get()
   async getListTopics(@Res() res, @Req() req, @Query() query?) {
-    console.log('params', query, req);
-
+    console.log('params1111', query.filter);
     const khoa_id = req.user.khoa_id;
     const viewAll = query.filter?.viewAll == 'true' ? true : false;
     const options = { khoa_id, viewAll };
     if (query?.semester_id) {
       options['semester_id'] = query.semester_id;
+    }
+
+    if (query.filter.status) {
+      //set filter to object
+      console.log('status neffffff', query.filter.status);
+      options['status'] = query.filter.status;
     }
 
     const data = await this.topicService.getLists(options);
