@@ -14,7 +14,7 @@ export class StudentIntern extends BaseEntity {
   student: Student;
 
   @Column({ type: 'enum', enum: ['new', 'finish', 'fail'], default: 'new' })
-  status: string;
+  intern_status: string;
 
   @Column({ name: 'semester_id' })
   semester_id: number;

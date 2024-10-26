@@ -23,34 +23,103 @@ export class StudentInternService {
     private readonly semesterService: SemesterService,
   ) {}
 
+  // async getLists(khoa_id, params): Promise<Student[]> {
+  //   const semester = await this.semesterService.getActiveSemester();
+  //   const options = {
+  //     select: {
+  //       id: true,
+  //       maso: true,
+  //       hodem: true,
+  //       ten: true,
+  //       email: true,
+  //       lop: true,
+  //       // studentIntern: {
+  //       //   intern_staus: true,
+  //       // },
+  //     },
+  //     where: {
+  //       khoa_id,
+  //       studentIntern: {
+  //         status: 'new',
+  //         semester: { id: semester.id },
+  //       },
+  //     },
+  //     relations: ['studentIntern'],
+  //   };
+  //   console.log('options1111', options, params);
+
+  //   return this.studentRepository.find({ ...options });
+  // }
+
+  // async getLists(khoa_id, params): Promise<Student[]> {
+  //   const semester = await this.semesterService.getActiveSemester();
+  //   const options = {
+  //     select: {
+  //       id: true,
+  //       maso: true,
+  //       hodem: true,
+  //       ten: true,
+  //       email: true,
+  //       lop: true,
+  //       studentTopic: {
+  //         group_id: true,
+  //         topic: {
+  //           ten: true,
+  //           teacher: {
+  //             hodem: true,
+  //             ten: true,
+  //           },
+  //         },
+  //       },
+  //     },
+  //     where: {
+  //       khoa_id,
+  //       studentTopic: {
+  //         status: 'new',
+  //         semester: { id: semester.id },
+  //       },
+  //     },
+  //     relations: {
+  //       studentTopic: {
+  //         topic: {
+  //           teacher: true,
+  //         },
+  //       },
+  //     },
+  //   };
+  //   console.log('options1111', options, params);
+
+  //   return this.studentRepository.find({ ...options });
+  // }
   async getLists(khoa_id, params): Promise<Student[]> {
     const semester = await this.semesterService.getActiveSemester();
     const options = {
-      select: {
-        id: true,
-        maso: true,
-        hodem: true,
-        ten: true,
-        email: true,
-        lop: true,
-        // studentIntern: {
-        //   intern_staus: true,
-        // },
-      },
-      where: {
-        khoa_id,
-        studentIntern: {
-          status: 'new',
-          semester: { id: semester.id },
+        select: {
+            id: true,
+            maso: true,
+            hodem: true,
+            ten: true,
+            email: true,
+            lop: true,
+            // studentIntern:  {
+            //   intern_staus: true,
+            // }     
+          },
+        where: {
+            khoa_id,
+            studentIntern: {
+              intern_status: 'new',
+              semester: { id: semester.id },
+            },
         },
-      },
-      relations: ['studentIntern'],
+        relations: ['studentIntern'],
     };
+
     console.log('options1111', options, params);
 
     return this.studentRepository.find({ ...options });
   }
-
+  
   async find(options): Promise<StudentIntern[]> {
     return this.studentInternRepository.find(options);
   }
