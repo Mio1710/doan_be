@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -21,6 +21,27 @@ export class SuperTeacherController {
   async getStudentTopic(@Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
     const data = await this.superTeacherService.getStudentTopic(khoa_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Get('student-groups')
+  async getStudentGroup(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const data = await this.superTeacherService.getStudentGroup(khoa_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+
+  @Put('student-group/lock')
+  async lockStudentGroup(@Res() res, @Req() req) {
+    const khoa_id = req.user.khoa_id;
+    const data = await this.superTeacherService.lockGroup(khoa_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('teacher-group/student')
+  async updateTeacherGroupStudent(@Res() res, @Body() body) {
+    const data = await this.superTeacherService.updateTeacherGroupStudent(body);
     return this.responseUtils.success({ data }, res);
   }
 }

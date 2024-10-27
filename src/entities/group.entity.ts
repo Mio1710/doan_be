@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { StudentTopic } from './student-topic.entity';
 import { Student } from './student.entity';
+import { TeacherGroup } from './teacher_group.entity';
 
 @Entity('groups')
 export class Group extends BaseEntity {
@@ -21,4 +22,8 @@ export class Group extends BaseEntity {
 
   @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.group)
   studentTopics: StudentTopic[];
+
+  @ManyToOne(() => TeacherGroup, (teacherGroup) => teacherGroup.studentGroups)
+  @JoinColumn({ name: 'teacher_group_id' })
+  teacherGroup: TeacherGroup;
 }

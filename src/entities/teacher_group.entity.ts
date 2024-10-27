@@ -3,6 +3,7 @@ import { BaseEntity } from './base.entity';
 import { Semester } from './semester.entity';
 import { Faculty } from './faculty.entity';
 import { TeacherGroupMember } from './teacher_group_member.entity';
+import { Group } from './group.entity';
 
 @Entity('teacher_groups')
 export class TeacherGroup extends BaseEntity {
@@ -22,4 +23,7 @@ export class TeacherGroup extends BaseEntity {
 
   @Column({ length: 100, type: 'varchar' })
   name: string;
+
+  @OneToMany(() => Group, (member) => member.teacherGroup)
+  studentGroups: TeacherGroupMember[];
 }

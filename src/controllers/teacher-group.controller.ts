@@ -10,7 +10,6 @@ import {
   Req,
   Query,
 } from '@nestjs/common';
-import { Roles } from 'src/decorators/role.decorator';
 import { TeacherGroupCreateDto } from 'src/dtos';
 import { TeacherGroup } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
