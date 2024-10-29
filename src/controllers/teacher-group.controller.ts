@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { TeacherGroupCreateDto } from 'src/dtos';
 import { TeacherGroup } from 'src/entities';
@@ -61,15 +62,18 @@ export class TeacherGroupController {
 
   @Put(':id')
   async updateTeacherGroup(
-    @Param() id: number,
-    @Body() teacherGroup: Partial<TeacherGroup>,
+    @Param('id') id: number,
+    @Body() teacherGroup: TeacherGroupCreateDto,
     @Res() res,
   ) {
-    const data = await this.teacherGroupService.update(
-      id,
-      teacherGroup as TeacherGroup,
-    );
+    const data = await this.teacherGroupService.update(id, teacherGroup);
     console.log('teacherGroup data', data);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Delete(':id')
+  async deleteTeacherGroup(@Param('id') id: number, @Res() res) {
+    const data = await this.teacherGroupService.delete(id);
     return this.responseUtils.success({ data }, res);
   }
 }

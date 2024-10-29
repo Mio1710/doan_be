@@ -2,7 +2,7 @@ import { TeacherGroupCreateDto } from 'src/dtos/teacher-group.dto';
 import { TeacherGroup, TeacherGroupMember, User } from 'src/entities';
 import { Repository } from 'typeorm';
 import { SemesterService } from './semester.service';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -60,6 +60,7 @@ export class TeacherGroupSerivce {
         name: true,
         teachers: {
           id: true,
+          teacher_id: true,
           teacher: {
             id: true,
             ten: true,
@@ -88,11 +89,41 @@ export class TeacherGroupSerivce {
     });
   }
 
-  async update(
-    id: number,
-    teacherGroup: Partial<TeacherGroup>,
-  ): Promise<TeacherGroup> {
-    await this.teacherGroupRepository.update(id, teacherGroup);
-    return await this.teacherGroupRepository.findOne({ where: { id } });
+  async update(id: number, data: TeacherGroupCreateDto) {
+    // delete all teacher in group
+    await this.teacherGroupMemberRepository.delete({ teacher_group: { id } });
+
+    // insert new teacher
+    const getListTeacherValid = await this.userRepository.findByIds(
+      data.teacher_ids,
+    );
+
+    await this.teacherGroupMemberRepository
+      .createQueryBuilder('teacher_group_members')
+      .insert()
+      .into(TeacherGroupMember)
+      .values(
+        getListTeacherValid.map((teacher) => ({
+          teacher: { id: teacher.id },
+          teacher_group: { id },
+        })),
+      )
+      .execute();
+
+    return true;
+  }
+
+  async delete(id: number): Promise<TeacherGroup[]> {
+    try {
+      const group = await this.teacherGroupRepository.find({ where: { id } });
+      await this.teacherGroupMemberRepository.delete({ teacher_group: { id } });
+      await this.teacherGroupRepository.delete({ id });
+      return group;
+    } catch (error) {
+      throw new HttpException(
+        'Không được xóa nhóm giảng viên này. Vui lòng kiểm tra lại!',
+        400,
+      );
+    }
   }
 }

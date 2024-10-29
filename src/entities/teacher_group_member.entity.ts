@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { TeacherGroup } from './teacher_group.entity';
@@ -9,7 +9,12 @@ export class TeacherGroupMember extends BaseEntity {
   @JoinColumn({ name: 'teacher_id' })
   teacher: User;
 
-  @ManyToOne(() => TeacherGroup, (teacherGroup) => teacherGroup.teachers)
+  @Column({ name: 'teacher_id', nullable: true })
+  teacher_id: number;
+
+  @ManyToOne(() => TeacherGroup, (teacherGroup) => teacherGroup.teachers, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'teacher_group_id' })
   teacher_group: TeacherGroup;
 }

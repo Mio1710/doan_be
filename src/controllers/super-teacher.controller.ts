@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Put, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Put,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -25,12 +34,11 @@ export class SuperTeacherController {
   }
 
   @Get('student-groups')
-  async getStudentGroup(@Res() res, @Req() req) {
+  async getStudentGroup(@Res() res, @Req() req, @Query() query) {
     const khoa_id = req.user.khoa_id;
-    const data = await this.superTeacherService.getStudentGroup(khoa_id);
+    const data = await this.superTeacherService.getStudentGroup(khoa_id, query);
     return this.responseUtils.success({ data }, res);
   }
-
 
   @Put('student-group/lock')
   async lockStudentGroup(@Res() res, @Req() req) {

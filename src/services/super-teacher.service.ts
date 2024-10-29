@@ -2,7 +2,7 @@ import { Group, Student, StudentTopic } from 'src/entities';
 import { SemesterService } from './semester.service';
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class SuperTeacherService {
@@ -99,17 +99,24 @@ export class SuperTeacherService {
     }
   }
 
-  async getStudentGroup(khoa_id: number) {
+  async getStudentGroup(khoa_id: number, query) {
     try {
+      const isNullGroupTeacher = query.filter?.is_null_group_teacher;
       const activeSemester = await this.semesterService.getActiveSemester();
-      const options = {
+      let options: FindOptionsWhere<Group> = {
         studentTopics: {
           semester_id: activeSemester.id,
           student: { khoa_id },
         },
       };
+      if (isNullGroupTeacher) {
+        options = {
+          ...options,
+          teacherGroup: IsNull(),
+        };
+      }
       const result = await this.groupRepository.find({
-        where: { ...options },
+        where: options,
         relations: {
           studentTopics: {
             student: true,
