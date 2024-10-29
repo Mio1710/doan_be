@@ -5,6 +5,7 @@ export * from './auth.service';
 export * from './semester.service';
 export * from './topic.service';
 export * from './student-topic.service';
+export * from './student-intern.service';
 export * from './super-teacher.service';
 export * from './lo.service';
 export * from './result.service';

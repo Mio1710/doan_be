@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
 import { StudentTopic } from './student-topic.entity';
+import { StudentIntern } from './student-intern.entity';
 import { Group } from './group.entity';
 
 @Entity('student')
@@ -39,6 +40,9 @@ export class Student extends BaseEntity {
 
   @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.student)
   studentTopic: StudentTopic[];
+
+  @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student)
+  studentIntern: StudentIntern[];
 
   @ManyToOne(() => Group)
   group: Group;

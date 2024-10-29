@@ -30,7 +30,7 @@ export class UserRepository {
 
   async create(user): Promise<User> {
     console.log('user before create repository', user);
-    user.faculty = { id: user.khoa_id };
+    // user.faculty = { id: user?.khoa_id };
     return await this.userRepository.save(user);
   }
 
