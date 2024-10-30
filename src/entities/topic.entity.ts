@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  DeleteDateColumn,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { StudentTopic } from './student-topic.entity';
@@ -30,6 +37,9 @@ export class Topic extends BaseEntity {
   @JoinColumn({ name: 'teacher_id' })
   teacher: User;
 
+  @Column({ name: 'teacher_id' })
+  teacher_id: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by' })
   createdBy: User;
@@ -46,4 +56,8 @@ export class Topic extends BaseEntity {
 
   @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.topic_id)
   studentTopic: StudentTopic[];
+
+  // add soft delete
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deletedAt: Date;
 }

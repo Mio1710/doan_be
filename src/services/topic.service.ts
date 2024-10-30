@@ -154,4 +154,61 @@ export class TopicService {
 
     return topics;
   }
+
+  async resetTopic(khoa_id: number) {
+    // get all current topics
+    const topics = await this.topicRepository.find({ where: { khoa_id } });
+
+    // soft delete all topic of khoa
+    await this.topicRepository
+      .createQueryBuilder()
+      .softDelete()
+      .from(Topic)
+      .where('khoa_id = :khoa_id', { khoa_id })
+      .andWhere('deleted_at IS NULL')
+      .execute();
+
+    // create new topics
+    await this.topicRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Topic, [
+        'description',
+        'knowledge',
+        'requirement',
+        'status',
+        'ten',
+        'khoa_id',
+        'created_by',
+        'teacher_id',
+      ])
+      .values(
+        topics.map((topic) => ({
+          description: topic.description,
+          knowledge: topic.knowledge,
+          requirement: topic.requirement,
+          status: 'pending',
+          ten: topic.ten,
+          khoa_id,
+          created_by: topic.created_by,
+          teacher_id: topic.teacher_id,
+        })),
+      )
+      .execute();
+
+    // add topic semester
+    const currentSemester = await this.semesterService.getActiveSemester();
+    const newTopics = await this.topicRepository.find({ where: { khoa_id } });
+    return await this.topicSemesterRepository
+      .createQueryBuilder()
+      .insert()
+      .into(TopicSemester, ['semester_id', 'topic_id'])
+      .values(
+        newTopics.map((topic) => ({
+          semester_id: currentSemester.id,
+          topic_id: topic.id,
+        })),
+      )
+      .execute();
+  }
 }
