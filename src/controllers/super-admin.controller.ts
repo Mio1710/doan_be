@@ -29,7 +29,7 @@ export class SuperAdminController {
 
   @Post('super-teacher')
   async createSuperTeacher(@Body() user: CreateUserDTO, @Res() res) {
-    user.roles = ['admin'];
+    user.roles = ['teacher', 'admin'];
     const { matkhau, ...data } = await this.userService.create(user);
     console.log('matkhautypes', matkhau);
     return this.responseUtils.success({ data }, res);
