@@ -49,7 +49,12 @@ export class TopicController {
   @Post()
   async createTopic(@Body() topic: CreateTopicDto, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
-    const data = await this.topicService.create({ ...topic, khoa_id });
+    const teacher_id = req.user.id;
+    const data = await this.topicService.create({
+      ...topic,
+      khoa_id,
+      teacher_id,
+    });
     console.log('topic data create', data);
     return this.responseUtils.success({ data }, res);
   }

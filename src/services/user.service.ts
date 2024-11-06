@@ -166,4 +166,30 @@ export class UserService {
       throw new HttpException(error, 400);
     }
   }
+
+  async updatePassword(userId, body): Promise<User> {
+    try {
+      const user = await this.findOne({ id: userId });
+      console.log('user usersService', user);
+
+      const oldPass = body.old_password;
+      const newPassword = body.new_password;
+
+      // check if the current password is correct
+      const isMatch = await bcrypt.compare(oldPass, user.matkhau);
+      if (!isMatch) {
+        throw new HttpException('Current password is incorrect', 400);
+      }
+      // hash the new password
+      const saltOrRounds = 10;
+      const hash = await bcrypt.hash(newPassword, saltOrRounds);
+
+      // update the password
+      user.matkhau = hash;
+      await this.update(user);
+      return;
+    } catch (error) {
+      throw new HttpException(error.message, error.code ?? 400);
+    }
+  }
 }
