@@ -12,7 +12,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { TeacherGroupCreateDto } from 'src/dtos';
-import { TeacherGroup } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { TeacherGroupSerivce } from 'src/services';

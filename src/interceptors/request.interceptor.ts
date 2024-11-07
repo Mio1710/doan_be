@@ -41,6 +41,8 @@ export class RequestInterceptor implements NestInterceptor {
     // set UserId for request
     this.cls.set('userId', user?.id || null);
     this.cls.set('khoa_id', user?.khoa_id || null);
+    console.log('user11111', user?.id, user?.khoa_id, user);
+    
     return next.handle();
   }
 }

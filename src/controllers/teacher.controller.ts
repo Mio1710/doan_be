@@ -56,4 +56,12 @@ export class TeacherController {
     console.log('lo data', data);
     return this.responseUtils.success({ data }, res);
   }
+
+  @Put('change-password')
+  async updatePassword(@Res() res, @Body() body, @Req() req) {
+    const user_id = req.user.id;
+
+    const data = await this.userService.updatePassword(user_id, body);
+    return this.responseUtils.success({ data }, res);
+  }
 }

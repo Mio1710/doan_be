@@ -29,6 +29,5 @@ export abstract class BaseEntity {
   })
   updated_at: Date;
 
-  @Column({ nullable: true })
-  deleted_at: Date;
+  deleted_at?: Date;
 }
