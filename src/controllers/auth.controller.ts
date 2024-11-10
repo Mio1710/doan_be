@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Req,
   Request,
   UseGuards,
   UsePipes,
@@ -50,12 +52,13 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('change-password')
-  async changePassword(@Body() body: ChangePasswordDto): Promise<any> {
-    return await this.authServeice.changePassword(
-      body.matkhau,
-      body.newPassword,
-    );
+  @Put('change-password')
+  async changePassword(
+    @Body() body: ChangePasswordDto,
+    @Req() req,
+  ): Promise<any> {
+    const user = req.user;
+    return await this.authServeice.changePassword(user, body);
   }
 
   @Post('logout')

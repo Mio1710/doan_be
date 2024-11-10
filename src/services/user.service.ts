@@ -178,7 +178,16 @@ export class UserService {
       // check if the current password is correct
       const isMatch = await bcrypt.compare(oldPass, user.matkhau);
       if (!isMatch) {
-        throw new HttpException('Current password is incorrect', 400);
+        throw new HttpException('Mật khẩu hiện tại không đúng', 400);
+      }
+
+      // check new password is same old password
+      const isSame = await bcrypt.compare(newPassword, user.matkhau);
+      if (isSame) {
+        throw new HttpException(
+          'Mật khẩu mới không được trùng với mật khẩu cũ',
+          400,
+        );
       }
       // hash the new password
       const saltOrRounds = 10;

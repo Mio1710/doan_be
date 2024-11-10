@@ -6,7 +6,6 @@ import {
 import { UserService, StudentService } from '../services';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +13,6 @@ export class AuthService {
     private usersService: UserService,
     private studentService: StudentService,
     private jwtService: JwtService,
-    private clsService: ClsService,
   ) {}
 
   async signIn(
@@ -56,28 +54,16 @@ export class AuthService {
     };
   }
 
-  async changePassword(oldPass: string, newPassword: string) {
+  async changePassword(user, data) {
     // get current user's password
     try {
-      const userId = this.clsService.get('userId');
-      console.log('userId', userId);
-
-      const user = await this.usersService.findOne({ id: userId });
-      console.log('user usersService', user);
-
-      // check if the current password is correct
-      const isMatch = await bcrypt.compare(oldPass, user.matkhau);
-      if (!isMatch) {
-        throw new HttpException('Current password is incorrect', 400);
+      const userId = user.id;
+      const roles = user.roles;
+      if (roles.includes('student')) {
+        return this.studentService.updatePassword(userId, data);
+      } else {
+        return this.usersService.updatePassword(userId, data);
       }
-      // hash the new password
-      const saltOrRounds = 10;
-      const hash = await bcrypt.hash(newPassword, saltOrRounds);
-
-      // update the password
-      user.matkhau = hash;
-      await this.usersService.update(user);
-      return;
     } catch (error) {
       throw new HttpException(error.message, error.code ?? 400);
     }
