@@ -1,7 +1,8 @@
-import { Entity, ManyToOne, JoinColumn, Column, Index } from 'typeorm';
+import { Entity, ManyToOne, OneToOne ,JoinColumn, Column, Index } from 'typeorm';
 import { Student } from './student.entity';
 import { Semester } from './semester.entity';
 import { BaseEntity } from './base.entity';
+import { Intern } from './intern.entity';
 
 @Entity('student_intern')
 @Index('IDX_student_semester', ['student_id', 'semester_id'], { unique: true })
@@ -14,7 +15,7 @@ export class StudentIntern extends BaseEntity {
   student: Student;
 
   @Column({ type: 'enum', enum: ['new', 'finish', 'fail'], default: 'new' })
-  intern_status: string;
+  status: string;
 
   @Column({ name: 'semester_id' })
   semester_id: number;
@@ -25,4 +26,8 @@ export class StudentIntern extends BaseEntity {
 
   @Column({ default: 1 })
   khoa_id: number;
+
+  @OneToOne(() => Intern, intern => intern.student_intern)
+  intern: Intern;
+
 }

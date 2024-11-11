@@ -40,7 +40,7 @@ export class StudentInternService {
         where: {
             khoa_id,
             studentIntern: {
-              intern_status: 'new',
+              status: 'new',
               semester: { id: semester.id },
             },
         },

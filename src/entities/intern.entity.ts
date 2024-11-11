@@ -39,7 +39,7 @@ export class Intern {
   @Column({ name: 'student_intern_id', nullable: true })
   student_intern_id: number;
 
-  @OneToOne(() => StudentIntern)
+  @OneToOne(() => StudentIntern, studentIntern => studentIntern.intern)
   @JoinColumn({ name: 'student_intern_id' })
   student_intern: StudentIntern;
 
