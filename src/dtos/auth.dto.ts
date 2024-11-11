@@ -15,3 +15,8 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   new_password: string;
 }
+
+export class UpdateProfileDto {
+  @Length(10, 11)
+  phone: string;
+}

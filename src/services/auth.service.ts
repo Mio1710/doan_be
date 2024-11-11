@@ -87,4 +87,22 @@ export class AuthService {
       throw new HttpException(error.message, error.code ?? 400);
     }
   }
+
+  async updateProfile(user, data) {
+    try {
+      const userId = user.id;
+      const roles = user.roles;
+      if (roles.includes('student')) {
+        const student = await this.studentService.findOne({ id: userId });
+        student.phone = data.phone;
+        return this.studentService.update(student);
+      } else {
+        const user = await this.usersService.findOne({ id: userId });
+        user.phone = data.phone;
+        return this.usersService.update(user);
+      }
+    } catch (error) {
+      throw new HttpException(error.message, error.code ?? 400);
+    }
+  }
 }

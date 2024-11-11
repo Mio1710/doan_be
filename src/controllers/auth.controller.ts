@@ -6,14 +6,21 @@ import {
   Put,
   Req,
   Request,
+  Res,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from 'src/entities';
 import { UserService, AuthService } from 'src/services';
-import { ChangePasswordDto, CreateUserDTO, SingInDto } from 'src/dtos';
+import {
+  ChangePasswordDto,
+  CreateUserDTO,
+  SingInDto,
+  UpdateProfileDto,
+} from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { ResponseUtils } from 'src/utils';
 
 @Controller('auth')
 @UsePipes(ValidationPipe)
@@ -21,6 +28,7 @@ export class AuthController {
   constructor(
     private readonly userService: UserService,
     private readonly authServeice: AuthService,
+    private readonly responseUtils: ResponseUtils,
   ) {}
 
   @Post('login')
@@ -64,5 +72,13 @@ export class AuthController {
   @Post('logout')
   logout() {
     return this.authServeice.logout();
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('profile')
+  async updateProfile(@Body() body: UpdateProfileDto, @Res() res, @Req() req) {
+    const user = req.user;
+    const data = await this.authServeice.updateProfile(user, body);
+    return this.responseUtils.success({ data }, res);
   }
 }
