@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Put,
   Res,
@@ -9,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { FacultyDto } from 'src/dtos';
-import { Faculty } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { FacultyService } from 'src/services';
@@ -31,13 +32,20 @@ export class FacultyController {
 
   @Roles('super_admin')
   @Post()
-  createFaculty(@Body() faculty: FacultyDto): Promise<Faculty> {
-    return this.facultyService.create(faculty);
+  async createFaculty(@Body() faculty: FacultyDto, @Res() res) {
+    const data = await this.facultyService.create(faculty);
+    return this.responseUtils.success({ data }, res);
   }
 
   @Put(':id')
   async updateFaculty(@Body() faculty: FacultyDto, @Res() res) {
     const data = await this.facultyService.update(faculty);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Delete(':id')
+  async deleteFaculty(@Param('id') id: number, @Res() res) {
+    const data = await this.facultyService.delete(id);
     return this.responseUtils.success({ data }, res);
   }
 }
