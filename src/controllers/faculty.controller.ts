@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -25,8 +26,13 @@ export class FacultyController {
   ) {}
 
   @Get()
-  async getListFacultys(@Res() res) {
-    const data = await this.facultyService.getLists();
+  async getListFacultys(@Res() res, @Query() query) {
+    const filter = query.filter;
+    const options = {
+      ...filter,
+    };
+
+    const data = await this.facultyService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
 

@@ -11,8 +11,8 @@ export class FacultyService {
     private readonly facultyRepository: Repository<Faculty>,
   ) {}
 
-  async getLists(): Promise<Faculty[]> {
-    return await this.facultyRepository.find();
+  async getLists(options): Promise<Faculty[]> {
+    return await this.facultyRepository.find({ ...options });
   }
 
   async create(faculty): Promise<Faculty> {
@@ -47,5 +47,31 @@ export class FacultyService {
 
   async findOne(id: number): Promise<Faculty> {
     return await this.facultyRepository.findOne({ where: { id } });
+  }
+
+  async getFacultyWithAdmins(): Promise<Faculty[]> {
+    return await this.facultyRepository
+      .createQueryBuilder('faculty')
+      .leftJoinAndSelect(
+        'faculty.teachers',
+        'teachers',
+        // Subquery to filter teachers with the 'admin' role
+        `teachers.id IN (
+        SELECT id FROM user WHERE JSON_CONTAINS(roles, :role) = 1 and deleted_at is null
+      )`,
+        { role: '"admin"' },
+      )
+      .select([
+        'faculty.id',
+        'faculty.ten',
+        'faculty.ma_khoa',
+        'teachers.id',
+        'teachers.maso',
+        'teachers.hodem',
+        'teachers.ten',
+        'teachers.email',
+        'teachers.phone',
+      ])
+      .getMany();
   }
 }

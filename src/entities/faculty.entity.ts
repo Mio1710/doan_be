@@ -1,5 +1,6 @@
-import { Entity, Column, DeleteDateColumn } from 'typeorm';
+import { Entity, Column, DeleteDateColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Faculty extends BaseEntity {
@@ -10,5 +11,8 @@ export class Faculty extends BaseEntity {
   ten: string;
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
-  deletedAt: Date;
+  deleted_at: Date;
+
+  @OneToMany(() => User, (user) => user.faculty)
+  teachers: User[];
 }

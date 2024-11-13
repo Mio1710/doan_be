@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateTeacherDto } from 'src/dtos';
 import { User } from 'src/entities';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 
 interface UserOptions {
   id?: number;
@@ -38,7 +38,7 @@ export class UserRepository {
     return await this.userRepository.save(user);
   }
 
-  async delete(user: User): Promise<User> {
-    return await this.userRepository.remove(user);
+  async delete(user: User): Promise<UpdateResult> {
+    return await this.userRepository.softDelete(user.id);
   }
 }

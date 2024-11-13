@@ -63,6 +63,14 @@ export class AdminController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Put(':id/reset-password')
+  async resetPassword(@Param('id') id: number, @Res() res) {
+    const { matkhau, ...data } = await this.userService.resetPassword(id);
+    console.log('matkhau', matkhau);
+
+    return this.responseUtils.success({ data }, res);
+  }
+
   @Get(':id')
   async getTeacherById(@Param() id: number, @Res() res) {
     const data = await this.userService.findOne(id);
