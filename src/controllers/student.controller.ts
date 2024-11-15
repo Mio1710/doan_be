@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Res,
-  Body,
-  UseInterceptors,
-  UploadedFile,
-  Req,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Post, Res, Body, Req } from '@nestjs/common';
 import { CreateStudentDto } from 'src/dtos';
 import { StudentService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
@@ -35,15 +25,6 @@ export class StudentController {
     student.khoa_id = req.user.khoa_id;
     const { matkhau, ...data } = await this.studentService.create(student);
     console.log('matkhau', matkhau);
-    return this.responseUtils.success({ data }, res);
-  }
-
-  @Post('import')
-  @UseInterceptors(FileInterceptor('file'))
-  async importTeacher(@UploadedFile() students, @Res() res, @Req() req) {
-    console.log('students students students students students', students);
-    const khoa_id = req.user.khoa_id;
-    const data = await this.studentService.import(students, khoa_id);
     return this.responseUtils.success({ data }, res);
   }
 }

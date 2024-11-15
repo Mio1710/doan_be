@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { SemesterService } from './semester.service';
 import { StudentService } from './student.service';
+import { UpdateResult } from 'typeorm';
 
 // manage teacher/admin
 // need exclude password field
@@ -44,7 +45,7 @@ export class UserService {
     }
   }
 
-  async delete(id): Promise<User> {
+  async delete(id): Promise<UpdateResult> {
     try {
       const user = await this.userRepository.findOne(id);
       console.log('user', user);
@@ -178,7 +179,16 @@ export class UserService {
       // check if the current password is correct
       const isMatch = await bcrypt.compare(oldPass, user.matkhau);
       if (!isMatch) {
-        throw new HttpException('Current password is incorrect', 400);
+        throw new HttpException('Mật khẩu hiện tại không đúng', 400);
+      }
+
+      // check new password is same old password
+      const isSame = await bcrypt.compare(newPassword, user.matkhau);
+      if (isSame) {
+        throw new HttpException(
+          'Mật khẩu mới không được trùng với mật khẩu cũ',
+          400,
+        );
       }
       // hash the new password
       const saltOrRounds = 10;
@@ -190,6 +200,18 @@ export class UserService {
       return;
     } catch (error) {
       throw new HttpException(error.message, error.code ?? 400);
+    }
+  }
+
+  async resetPassword(id: number): Promise<User> {
+    try {
+      const user = await this.findOne({ id });
+      const saltOrRounds = 10;
+      const hash = await bcrypt.hash('12345678', saltOrRounds);
+      user.matkhau = hash;
+      return await this.update(user);
+    } catch (error) {
+      throw new HttpException(error, 400);
     }
   }
 }

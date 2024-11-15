@@ -7,11 +7,16 @@ export class SingInDto {
 }
 
 export class ChangePasswordDto {
-  @Length(6, 20)
+  @Length(8, 20)
   @IsNotEmpty()
-  matkhau: string;
+  old_password: string;
 
-  @Length(6, 20)
+  @Length(8, 20)
   @IsNotEmpty()
-  newPassword: string;
+  new_password: string;
+}
+
+export class UpdateProfileDto {
+  @Length(10, 11)
+  phone: string;
 }

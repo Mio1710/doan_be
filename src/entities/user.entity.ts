@@ -1,7 +1,6 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany, DeleteDateColumn } from 'typeorm';
 import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
-import { TeacherGroup } from './teacher_group.entity';
 import { TeacherGroupMember } from './teacher_group_member.entity';
 
 @Entity()
@@ -45,4 +44,7 @@ export class User extends BaseEntity {
     (teacherGroupMember) => teacherGroupMember.teacher,
   )
   teacher_group_members: TeacherGroupMember[];
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deleted_at: Date;
 }
