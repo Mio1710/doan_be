@@ -27,7 +27,11 @@ export class StudentIntern extends BaseEntity {
   @Column({ default: 1 })
   khoa_id: number;
 
-  @OneToOne(() => Intern, intern => intern.student_intern)
+  @Column({ name: 'intern_id', nullable: true })
+  intern_id: number;
+
+  @OneToOne(() => Intern)
+  @JoinColumn({ name: 'intern_id' })
   intern: Intern;
 
 }
