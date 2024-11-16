@@ -49,7 +49,7 @@ export class InternController {
   @Post()
   async createIntern(@Body() intern: CreateInternDto, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
-    const student_intern_id = req.student_intern.id;
+    const student_intern_id = req.user.id;
     const data = await this.internService.create({
       ...intern,
       khoa_id,

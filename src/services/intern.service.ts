@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { ListInternQuery } from 'src/interfaces/queries/listIntern.interface';
 import { SemesterService } from './semester.service';
+import { InternSemester } from '../entities';
 
 @Injectable()
 export class InternService {
@@ -15,8 +16,8 @@ export class InternService {
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>,
 
-    // @InjectRepository(TopicSemester)
-    // private readonly topicSemesterRepository: Repository<TopicSemester>,
+    @InjectRepository(InternSemester)
+    private readonly internSemesterRepository: Repository<InternSemester>,
 
     private readonly semesterService: SemesterService,
     private readonly cls: ClsService,
@@ -36,9 +37,9 @@ export class InternService {
     // select information
     const query = this.internRepository
       .createQueryBuilder('intern')
-      .leftJoinAndSelect('intern.student_intern', 'student_intern')
+      .leftJoinAndSelect('intern.student', 'student')
       .leftJoinAndSelect('intern.khoa', 'khoa')
-      .leftJoinAndSelect('intern.semesters', 'semester')
+      .leftJoinAndSelect('intern.semester', 'semester')
       .select([
         'intern.company_name',
         'intern.address',
@@ -50,26 +51,10 @@ export class InternService {
         'intern.status',
         'intern.score',
         'intern.id',
-        'student_intern.ten',
-        'student_intern.hodem',
-        'student_intern.id',
+        'student.ten',
+        'student.hodem',
+        'student.id',
       ]);
-
-    // const query = this.internRepository
-    //   .createQueryBuilder('intern')
-    //   .leftJoinAndSelect('intern.teacher', 'user')
-    //   .leftJoinAndSelect('intern.khoa', 'khoa')
-    //   .leftJoinAndSelect('intern.semesters', 'semester')
-    //   .select([
-    //     'intern.company_name',
-    //     'intern.address',
-    //     'intern.company_phone',
-    //     'intern.company_email',
-    //     'intern.status',
-    //     'user.ten',
-    //     'user.hodem',
-    //     'user.id',
-    //   ]);
 
     // add condition
     query
@@ -97,12 +82,12 @@ export class InternService {
     // active semester
     const currentSemester = await this.semesterService.getActiveSemester();
 
-    // const topicSemester = await this.topicSemesterRepository.save({
-    //   topic_id: data.id,
-    //   semester_id: currentSemester.id,
-    // });
+    const internSemester = await this.internSemesterRepository.save({
+      intern_id: data.id,
+      semester_id: currentSemester.id,
+    });
 
-    // console.log('topicSemester', topicSemester);
+    console.log('internSemester', internSemester);
 
     return data;
   }
@@ -219,6 +204,21 @@ export class InternService {
           khoa_id,
           created_by: intern.created_by,
           teacher_id: intern.teacher_id,
+        })),
+      )
+      .execute();
+
+          // add topic semester
+    const currentSemester = await this.semesterService.getActiveSemester();
+    const newInterns = await this.internRepository.find({ where: { khoa_id } });
+    return await this.internSemesterRepository
+      .createQueryBuilder()
+      .insert()
+      .into(InternSemester, ['semester_id', 'intern_id'])
+      .values(
+        newInterns.map((intern) => ({
+          semester_id: currentSemester.id,
+          intern_id: intern.id,
         })),
       )
       .execute();
