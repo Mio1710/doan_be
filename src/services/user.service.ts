@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
 import { SemesterService } from './semester.service';
 import { StudentService } from './student.service';
-import { UpdateResult } from 'typeorm';
+import { FindManyOptions, ILike, UpdateResult } from 'typeorm';
 
 // manage teacher/admin
 // need exclude password field
@@ -19,8 +19,21 @@ export class UserService {
     private readonly studentService: StudentService,
   ) {}
 
-  getLists(options): Promise<User[]> {
-    return this.userRepository.findAll(options);
+  async getLists(options): Promise<User[]> {
+    console.log('options query', options.query.query);
+
+    const findQuery = this.userRepository.createQueryBuilder();
+    const { khoa_id, query } = options.query;
+    if (khoa_id) {
+      findQuery.andWhere('khoa_id = :khoa_id', { khoa_id });
+    }
+    if (query?.filter?.q) {
+      findQuery.andWhere(
+        'maso like :query or hodem like :query or ten like :query',
+        { query: `%${query.filter.q}%` },
+      );
+    }
+    return findQuery.getMany();
   }
 
   async create(user: CreateUserDTO): Promise<User> {
