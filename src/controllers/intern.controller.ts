@@ -17,14 +17,23 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { InternService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
+// import { UserService } from '../services/user.service';
 
 @Controller('interns')
 @UseGuards(AuthGuard, RolesGuard)
 export class InternController {
   constructor(
     private readonly internService: InternService,
+    // private readonly userService: UserService,
     private readonly responseUtils: ResponseUtils,
   ) {}
+
+//   @Get('teachers')
+// async getTeachers(@Res() res, @Req() req) {
+//   const khoa_id = req.user.khoa_id;
+//   const data = await this.internService.getListTeachers(khoa_id);
+//   return this.responseUtils.success({ data }, res);
+// }
 
   @Get()
   async getListInterns(@Res() res, @Req() req, @Query() query?) {

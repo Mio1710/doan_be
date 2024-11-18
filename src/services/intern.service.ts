@@ -6,7 +6,8 @@ import { ClsService } from 'nestjs-cls';
 import { ListInternQuery } from 'src/interfaces/queries/listIntern.interface';
 import { SemesterService } from './semester.service';
 import { InternSemester } from '../entities';
-
+// import { User } from '../entities/user.entity';
+// import { UserService } from './user.service';
 @Injectable()
 export class InternService {
   constructor(
@@ -19,9 +20,15 @@ export class InternService {
     @InjectRepository(InternSemester)
     private readonly internSemesterRepository: Repository<InternSemester>,
 
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
+
+    // private readonly userService: UserService,
+
     private readonly semesterService: SemesterService,
     private readonly cls: ClsService,
   ) {}
+
 
   async getLists(options?: ListInternQuery): Promise<Intern[]> {
     let semester_id = options?.semester_id;
@@ -39,7 +46,7 @@ export class InternService {
       .createQueryBuilder('intern')
       .leftJoinAndSelect('intern.student', 'student')
       .leftJoinAndSelect('intern.khoa', 'khoa')
-      .leftJoinAndSelect('intern.semester', 'semester')
+      .leftJoinAndSelect('intern.semesters', 'semester')
       .select([
         'intern.company_name',
         'intern.address',
@@ -189,7 +196,8 @@ export class InternService {
         'status',
         'khoa_id',
         'created_by',
-        'teacher_id',
+        // 'teacher_id',
+        'student_intern_id',
       ])
       .values(
         interns.map((intern) => ({
@@ -203,12 +211,13 @@ export class InternService {
           status: 'pending',
           khoa_id,
           created_by: intern.created_by,
-          teacher_id: intern.teacher_id,
+          // teacher_id: intern.teacher_id,
+          student_intern_id: intern.student_intern_id,
         })),
       )
       .execute();
 
-          // add topic semester
+    // add intern semester
     const currentSemester = await this.semesterService.getActiveSemester();
     const newInterns = await this.internRepository.find({ where: { khoa_id } });
     return await this.internSemesterRepository

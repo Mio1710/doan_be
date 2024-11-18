@@ -11,7 +11,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateStudentDto } from 'src/dtos';
+import { CreateStudentDto, UpdateStudentInternDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { SemesterService, StudentInternService } from 'src/services';
@@ -48,6 +48,19 @@ export class StudentInternController {
     const khoa_id = req.user.khoa_id;
 
     const data = await this.studentInternService.import(students, khoa_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post('intern')
+  async updateIntern(
+    @Res() res,
+    @Req() req,
+    @Body() intern: UpdateStudentInternDto,
+  ) {
+    const userId = req.user.id;
+    console.log('check data update', intern, userId, intern.intern_id);
+
+    const data = await this.studentInternService.update(userId, intern);
     return this.responseUtils.success({ data }, res);
   }
 }

@@ -38,6 +38,9 @@ export class Intern extends BaseEntity {
   @Column({ length: 50, type: 'char', nullable: true })
   supervisor_email: string;
 
+  @Column({ type: 'float', nullable: true })
+  score: number;
+
   @Column({
     type: 'enum',
     enum: ['pending', 'approved', 'rejected'],
@@ -52,23 +55,12 @@ export class Intern extends BaseEntity {
   @Column({ name: 'teacher_id', nullable: true })
   teacher_id: number;
 
-  // @OneToOne(() => Student)
-  // @JoinColumn({ name: 'created_by' })
-  // createdBy: Student;
-
   @ManyToOne(() => Student)
   @JoinColumn({ name: 'student_intern_id'})
   student: Student;
 
   @Column({ name: 'student_intern_id'})
   student_intern_id: number;
-
-  // @Column({ name: 'semester_id' })
-  // semester_id: number;
-
-  // @ManyToOne(() => Semester)
-  // @JoinColumn({ name: 'semester_id' })
-  // semester: Semester;
 
   @Column({ name: 'khoa_id' })
   khoa_id: number;

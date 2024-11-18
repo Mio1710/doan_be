@@ -18,9 +18,8 @@ export class CreateStudentDto {
 
   @IsOptional()
   @Length(6, 20)
-  matkhau: string = '123456';
-  // matkhau: string;
-
+  matkhau: string = '12345678';
+  
   @IsNotEmpty()
   lop: string;
 
@@ -46,7 +45,7 @@ export class UpdateStudentDto {
 
   @IsOptional()
   @Length(6, 20)
-  matkhau: string = '123456';
+  matkhau: string = '12345678';
   // matkhau: string;
 
   @IsOptional()
@@ -60,3 +59,12 @@ export class UpdateStudentTopicDto {
   @IsOptional()
   topic_id?: number;
 }
+
+export class UpdateStudentInternDto {
+  @IsOptional()
+  student_intern_id?: number;
+
+  @IsOptional()
+  intern_id?: number;
+}
+
