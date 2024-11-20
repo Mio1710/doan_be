@@ -10,10 +10,10 @@ import { CreateInternDto } from 'src/dtos/intern.dto';
 import { User } from '../entities/user.entity';
 // import { UserService } from './user.service';
 @Injectable()
-export class InternService {
+export class TeacherInternService {
   constructor(
     @InjectRepository(Intern)
-    private readonly internRepository: Repository<Intern>,
+    private readonly teacherInternRepository: Repository<Intern>,
 
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>,
@@ -43,7 +43,7 @@ export class InternService {
     console.log('semester_id', semester_id, khoa_id, options, viewAll);
 
     // select information
-    const query = this.internRepository
+    const query = this.teacherInternRepository
       .createQueryBuilder('intern')
       .leftJoinAndSelect('intern.student', 'student')
       .leftJoinAndSelect('intern.teacher', 'user')
@@ -75,7 +75,7 @@ export class InternService {
       .andWhere('intern.khoa_id = :khoa_id', { khoa_id });
 
      //Lấy danh sách thực tập theo giảng viên được đăng ký
-    // query.andWhere('intern.teacher_id = :userID', { userID });
+    query.andWhere('intern.teacher_id = :userID', { userID });
 
     if (!viewAll) {
       query.andWhere('intern.created_by = :userID', { userID });
@@ -91,7 +91,7 @@ export class InternService {
 
   async create(intern): Promise<Intern> {
     console.log('intern before create', intern);
-    const data = await this.internRepository.save(intern);
+    const data = await this.teacherInternRepository.save(intern);
     console.log('intern data create', data);
 
     // active semester
@@ -108,19 +108,19 @@ export class InternService {
   }
 
   async update(id: number, intern: Intern) {
-    return await this.internRepository.update(id, intern);
+    return await this.teacherInternRepository.update(id, intern);
   }
 
   async delete(id: number): Promise<Intern[]> {
-    const intern = await this.internRepository.find({ where: { id } });
-    return await this.internRepository.remove(intern);
+    const intern = await this.teacherInternRepository.find({ where: { id } });
+    return await this.teacherInternRepository.remove(intern);
   }
 
   async findOne(options): Promise<Intern> {
     try {
       console.log('options', options);
 
-      const intern = await this.internRepository.findOne({
+      const intern = await this.teacherInternRepository.findOne({
         where: { ...options },
       });
 
@@ -129,15 +129,15 @@ export class InternService {
       throw new HttpException(error, 400);
     }
   }
-  async checkIntern(id: number, status: string) {
+  async checkTeacherIntern(id: number, status: string) {
     console.log('check id', id, status);
 
-    const intern = await this.internRepository.findOne({ where: { id } });
+    const intern = await this.teacherInternRepository.findOne({ where: { id } });
     if (intern.status === 'pending') {
       console.log('intern before', intern, status);
       intern.status = status;
       console.log('intern', intern);
-      return await this.internRepository.save(intern);
+      return await this.teacherInternRepository.save(intern);
     } else {
       throw new HttpException('Intern is not pending', 400);
     }
@@ -146,7 +146,7 @@ export class InternService {
   async getRegistedDetail() {
     // const userId = this.cls.get('userId');
 
-    return await this.internRepository
+    return await this.teacherInternRepository
       .createQueryBuilder('intern')
       .leftJoinAndSelect('intern.studentSubjects', 'studentSubjects')
       .leftJoinAndSelect('studentSubjects.student', 'student')
@@ -154,7 +154,7 @@ export class InternService {
       .getOne();
   }
 
-  async getListIntern(
+  async getListTeacherIntern(
     options?: ListInternQuery,
     khoa_id?: number,
   ): Promise<Intern[]> {
@@ -167,7 +167,7 @@ export class InternService {
         .getRawOne();
     }
     console.log('semester_id', semester);
-    const interns = await this.internRepository
+    const interns = await this.teacherInternRepository
       .createQueryBuilder('intern')
       .where('intern.khoa_id = :khoa_id', { khoa_id: khoa_id })
       .getMany();
@@ -177,10 +177,10 @@ export class InternService {
 
   async resetIntern(khoa_id: number) {
     // get all current interns
-    const interns = await this.internRepository.find({ where: { khoa_id } });
+    const interns = await this.teacherInternRepository.find({ where: { khoa_id } });
 
     // soft delete all intern of khoa
-    await this.internRepository
+    await this.teacherInternRepository
       .createQueryBuilder()
       .softDelete()
       .from(Intern)
@@ -189,7 +189,7 @@ export class InternService {
       .execute();
 
     // create new interns
-    await this.internRepository
+    await this.teacherInternRepository
       .createQueryBuilder()
       .insert()
       .into(Intern, [
@@ -227,7 +227,7 @@ export class InternService {
 
     // add intern semester
     const currentSemester = await this.semesterService.getActiveSemester();
-    const newInterns = await this.internRepository.find({ where: { khoa_id } });
+    const newInterns = await this.teacherInternRepository.find({ where: { khoa_id } });
     return await this.internSemesterRepository
       .createQueryBuilder()
       .insert()

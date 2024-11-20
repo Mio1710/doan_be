@@ -15,21 +15,21 @@ import { CreateInternDto } from 'src/dtos';
 import { Intern } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { InternService } from 'src/services';
+import { TeacherInternService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 // import { UserService } from '../services/user.service';
 
-@Controller('interns')
+@Controller('teacher-interns')
 @UseGuards(AuthGuard, RolesGuard)
-export class InternController {
+export class TeacherInternController {
   constructor(
-    private readonly internService: InternService,
+    private readonly teacherInternService: TeacherInternService,
     // private readonly userService: UserService,
     private readonly responseUtils: ResponseUtils,
   ) {}
 
   @Get()
-  async getListInterns(@Res() res, @Req() req, @Query() query?) {
+  async getListTeacherInterns(@Res() res, @Req() req, @Query() query?) {
     console.log('params1111', query.filter);
     const khoa_id = req.user.khoa_id;
     const viewAll = query.filter?.viewAll == 'true' ? true : false;
@@ -43,15 +43,16 @@ export class InternController {
       console.log('status neffffff', query.filter.status);
       options['status'] = query.filter.status;
     }
-    const data = await this.internService.getLists(options);
+    
+    const data = await this.teacherInternService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
 
   @Post()
-  async createIntern(@Body() intern: CreateInternDto, @Res() res, @Req() req) {
+  async createTeacherIntern(@Body() intern: CreateInternDto, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
     const student_intern_id = req.user.id;
-    const data = await this.internService.create({
+    const data = await this.teacherInternService.create({
       ...intern,
       khoa_id,
       student_intern_id,
@@ -62,28 +63,28 @@ export class InternController {
 
   @Get('registed')
   async getInternRegistedDetail(@Res() res) {
-    const data = await this.internService.getRegistedDetail();
+    const data = await this.teacherInternService.getRegistedDetail();
     console.log('intern data', data);
 
     return this.responseUtils.success({ data }, res);
   }
 
   @Get(':id')
-  async getInternById(@Param() id: number, @Res() res) {
+  async getTeacherInternById(@Param() id: number, @Res() res) {
     console.log('intern id', id);
 
-    const data = await this.internService.findOne({ id });
+    const data = await this.teacherInternService.findOne({ id });
     console.log('intern data', data);
     return this.responseUtils.success({ data }, res);
   }
 
   @Put(':id')
-  async updateIntern(
+  async updateTeacherIntern(
     @Param() id: number,
     @Body() intern: Partial<Intern>,
     @Res() res,
   ) {
-    const data = await this.internService.update(id, intern as Intern);
+    const data = await this.teacherInternService.update(id, intern as Intern);
     console.log('intern data', data);
     return this.responseUtils.success({ data }, res);
   }
@@ -97,7 +98,7 @@ export class InternController {
   ) {
     console.log('intern id', id);
 
-    const data = await this.internService.checkIntern(id, status);
+    const data = await this.teacherInternService.checkTeacherIntern(id, status);
     console.log('intern data', data);
     return this.responseUtils.success({ data }, res);
   }

@@ -3,4 +3,5 @@ export interface ListInternQuery {
     semester_id?: number;
     viewAll?: boolean;
     status?: string[];
+    teacher_id?: number;
 }

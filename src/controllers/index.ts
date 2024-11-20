@@ -13,3 +13,6 @@ export * from './result.controller';
 export * from './admin.controller';
 export * from './teacher-group.controller';
 export * from './intern.controller';
+export * from './teacher-intern.controller';
+export * from './student-teacher.controller'
+
