@@ -19,6 +19,8 @@ export class UserRepository {
   ) {}
 
   async findAll(options): Promise<User[]> {
+    console.log('options in repository', options);
+
     return await this.userRepository.find({ ...options });
   }
 
@@ -40,5 +42,9 @@ export class UserRepository {
 
   async delete(user: User): Promise<UpdateResult> {
     return await this.userRepository.softDelete(user.id);
+  }
+
+  createQueryBuilder() {
+    return this.userRepository.createQueryBuilder();
   }
 }

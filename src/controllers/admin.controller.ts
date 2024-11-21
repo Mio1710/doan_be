@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UploadedFile,
@@ -34,9 +35,9 @@ export class AdminController {
   }
 
   @Get()
-  async getListTeachers(@Res() res, @Req() req) {
+  async getListTeachers(@Res() res, @Req() req, @Query() query) {
     const khoa_id = req.user.khoa_id;
-    const options = { where: { khoa_id } };
+    const options = { query: { khoa_id, query } };
     const data = await this.userService.getLists(options);
     return this.responseUtils.success({ data }, res);
   }
