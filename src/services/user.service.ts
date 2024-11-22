@@ -36,6 +36,10 @@ export class UserService {
     return findQuery.getMany();
   }
 
+  getListss(options): Promise<User[]> {
+    return this.userRepository.findAll(options);
+  }
+
   async create(user: CreateUserDTO): Promise<User> {
     const isExist = await this.checkExistUser(user.maso);
     console.log('user before isExist', isExist, user.maso);

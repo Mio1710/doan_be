@@ -38,7 +38,7 @@ import {
     async getListTeachers(@Res() res, @Req() req) {
       const khoa_id = req.user.khoa_id;
       const options = { where: { khoa_id } };
-      const data = await this.userService.getLists(options);
+      const data = await this.userService.getListss(options);
       return this.responseUtils.success({ data }, res);
     }
   
