@@ -1,4 +1,13 @@
-import { IsArray, IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { Optional } from '@nestjs/common';
+import { Transform } from 'class-transformer';
+import {
+  IsArray,
+  IsDate,
+  IsNotEmpty,
+  IsOptional,
+  Length,
+  Matches,
+} from 'class-validator';
 
 // export class CreateUserDTO {
 //   maso: string;
@@ -67,4 +76,32 @@ export class UpdateTeacherDto {
   @IsArray()
   @IsOptional()
   roles: string[] = ['teacher'];
+}
+
+export class ImportUserDto {
+  @IsNotEmpty({ message: 'Mã số không được để trống' })
+  maso: string;
+
+  @IsNotEmpty({ message: 'Họ đệm không được để trống' })
+  hodem: string;
+
+  @IsNotEmpty({ message: 'Tên không được để trống' })
+  ten: string;
+
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email: string;
+
+  @Optional()
+  @IsDate({ message: 'Ngày sinh không đúng định dạng' })
+  ngay_sinh: Date;
+
+  @Optional()
+  is_admin: number;
+
+  @Optional()
+  is_super_teacher: number;
+
+  roles: string[];
+  matkhau: string;
+  khoa_id: number;
 }

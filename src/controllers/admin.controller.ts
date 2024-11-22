@@ -98,7 +98,11 @@ export class AdminController {
       );
     }
     const data = await this.userService.import(teachers, khoa_id);
-    return this.responseUtils.success({ data }, res);
+    if (data.status === 'success') {
+      return this.responseUtils.success({ data }, res);
+    } else {
+      this.userService.sendExcelFile(res, data, 'error_teacher.xlsx');
+    }
   }
 
   @Post(':id/update-role')

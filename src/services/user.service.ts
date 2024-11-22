@@ -3,10 +3,13 @@ import { Student, User } from 'src/entities';
 import { UserRepository } from 'src/repositories';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
-import { CreateUserDTO, UpdateTeacherDto } from 'src/dtos';
+import { CreateUserDTO, ImportUserDto, UpdateTeacherDto } from 'src/dtos';
 import { SemesterService } from './semester.service';
 import { StudentService } from './student.service';
-import { FindManyOptions, ILike, UpdateResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
+import { Response } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
 // manage teacher/admin
 // need exclude password field
@@ -38,7 +41,7 @@ export class UserService {
 
   async create(user: CreateUserDTO): Promise<User> {
     const isExist = await this.checkExistUser(user.maso);
-    console.log('user before isExist', isExist, user.maso);
+    console.log('user before isExist', user.maso, isExist);
     if (isExist) {
       throw new HttpException('User already exists', 400);
     }
@@ -86,47 +89,217 @@ export class UserService {
   }
 
   checkExistUser(maso: string): Promise<User> {
+    if (!maso) {
+      return null;
+    }
     return this.userRepository.findOne({ maso });
   }
 
-  async import(file, khoa_id: number): Promise<User[]> {
+  // async import(file, khoa_id: number) {
+  //   try {
+  //     const requiredHeaders = [
+  //       'STT',
+  //       'maso',
+  //       'hodem',
+  //       'ten',
+  //       'email',
+  //       'ngay_sinh',
+  //       'is_admin',
+  //       'is_super_teacher',
+  //     ];
+
+  //     const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+  //     const workSheet = workbook.Sheets[workbook.SheetNames[0]];
+  //     const headersRow = XLSX.utils.sheet_to_json(workSheet, { header: 1 })[0];
+  //     console.log('Headers:', headersRow);
+  //     if (JSON.stringify(headersRow) !== JSON.stringify(requiredHeaders)) {
+  //       throw new HttpException('File không đúng định dạng', 400);
+  //     }
+  //     const data = XLSX.utils.sheet_to_json(workSheet);
+  //     const errors = [];
+
+  //     const users = await Promise.all(
+  //       data.map(async (user: ImportUserDto) => {
+  //         const userInstance = plainToInstance(ImportUserDto, user);
+  //         const validationErrors = await validate(userInstance);
+  //         if (validationErrors.length > 0) {
+  //           errors.push({
+  //             ...user,
+  //             error: validationErrors,
+  //           });
+  //           return;
+  //         }
+
+  //         const isExist = await this.checkExistUser(user.maso);
+  //         if (isExist) {
+  //           console.log('user isExist', user.maso, isExist);
+  //           errors.push({
+  //             ...user,
+  //             error: 'Người dùng đã tồn tại',
+  //           });
+  //           return;
+  //         }
+  //         console.log('typeof user.ngay_sinh', typeof user.ngay_sinh);
+
+  //         console.log('mã số user', user.maso, user.ngay_sinh);
+
+  //         user.roles = ['teacher'];
+  //         if (user.is_super_teacher == 1) {
+  //           user.roles.push('super_teacher');
+  //         }
+  //         if (user.is_admin == 1) {
+  //           user.roles.push('admin');
+  //         }
+
+  //         const saltOrRounds = 10;
+  //         const hash = await bcrypt.hash('12345678', saltOrRounds);
+  //         user.matkhau = hash;
+  //         console.log('user before create', user);
+  //         // add khoa_id
+  //         user.khoa_id = khoa_id;
+
+  //         try {
+  //           return await this.userRepository.create(user);
+  //         } catch (error) {
+  //           console.log('error create user', user);
+  //           errors.push({
+  //             ...user,
+  //             error: error.message,
+  //           });
+  //         }
+  //       }),
+  //     );
+
+  //     if (errors.length > 0) {
+  //       // return file with error
+  //       const writeBook = XLSX.utils.book_new();
+  //       const writeSheet = XLSX.utils.json_to_sheet(errors);
+
+  //       XLSX.utils.book_append_sheet(writeBook, writeSheet, 'Errors');
+
+  //       return XLSX.write(writeBook, { bookType: 'xlsx', type: 'buffer' });
+  //     }
+
+  //     return { status: 'success', data: users };
+  //   } catch (error) {
+  //     console.log('error is_super_teacheris_super_teacher', error);
+
+  //     throw new HttpException(error, 400);
+  //   }
+  // }
+  async import(file, khoa_id: number) {
     try {
-      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-      const workSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(workSheet);
-      console.log('data ExpressExpressExpress', data);
-      const users = await Promise.all(
-        data.map(async (user: User) => {
-          const isExist = await this.checkExistUser(user.maso);
+      const requiredHeaders = [
+        'STT',
+        'maso',
+        'hodem',
+        'ten',
+        'email',
+        'ngay_sinh',
+        'is_admin',
+        'is_super_teacher',
+      ];
+
+      const workbook = XLSX.read(file.buffer, {
+        type: 'buffer',
+        cellDates: true,
+      });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      // Validate headers
+      const headersRow = XLSX.utils.sheet_to_json(worksheet, { header: 1 })[0];
+      console.log('Headers:', headersRow);
+      if (JSON.stringify(headersRow) !== JSON.stringify(requiredHeaders)) {
+        throw new HttpException('File không đúng định dạng', 400);
+      }
+
+      const rawData: ImportUserDto[] = XLSX.utils.sheet_to_json(worksheet);
+      const errors: any[] = [];
+      const validUsers: ImportUserDto[] = [];
+
+      for (const rawUser of rawData) {
+        try {
+          const userInstance = plainToInstance(ImportUserDto, rawUser);
+
+          // Validate using class-validator
+          const validationErrors = await validate(userInstance);
+          if (validationErrors.length > 0) {
+            errors.push({
+              ...rawUser,
+              ngay_sinh: `${rawUser.ngay_sinh.getDate()}/${rawUser.ngay_sinh.getMonth()}/${rawUser.ngay_sinh.getFullYear()}`,
+              error: validationErrors
+                .map((err) => Object.values(err.constraints || {}))
+                .flat()
+                .join(', '),
+            });
+            continue;
+          }
+
+          // Check if user already exists
+          const isExist = await this.checkExistUser(userInstance.maso);
+          console.log('user isExist', userInstance.maso, isExist);
           if (isExist) {
-            return;
+            errors.push({
+              ...rawUser,
+              ngay_sinh: `${rawUser.ngay_sinh.getDate() + 1}/${rawUser.ngay_sinh.getMonth() + 1}/${rawUser.ngay_sinh.getFullYear()}`,
+              error: 'Người dùng đã tồn tại',
+            });
+            continue;
           }
 
-          user.roles = ['teacher'];
-          if (user.is_super_teacher == 1) {
-            user.roles.push('super_teacher');
-          }
-          if (user.is_admin == 1) {
-            user.roles.push('admin');
-          }
+          // Process user fields
+          userInstance.roles = ['teacher'];
+          if (userInstance.is_super_teacher === 1)
+            userInstance.roles.push('super_teacher');
+          if (userInstance.is_admin === 1) userInstance.roles.push('admin');
 
-          const saltOrRounds = 10;
-          const hash = await bcrypt.hash('12345678', saltOrRounds);
-          user.matkhau = hash;
-          console.log('user before create', user);
-          // add khoa_id
-          user.khoa_id = khoa_id;
+          userInstance.matkhau = await bcrypt.hash('12345678', 10);
 
-          return await this.userRepository.create(user);
-        }),
+          userInstance.khoa_id = khoa_id;
+
+          validUsers.push(userInstance);
+        } catch (error) {
+          console.error('Error processing user:', rawUser.maso, error.message);
+          errors.push({ ...rawUser, error: error.message });
+        }
+      }
+
+      // Save valid users to database
+      console.log('Valid users:', validUsers);
+
+      const savedUsers = await Promise.all(
+        validUsers.map((user) => this.userRepository.create(user)),
       );
 
-      return users;
-    } catch (error) {
-      console.log('error is_super_teacheris_super_teacher', error);
+      // Write errors to Excel file if any
+      if (errors.length > 0) {
+        errors.sort((a, b) => a.STT - b.STT);
+        const errorWorkbook = XLSX.utils.book_new();
+        const errorSheet = XLSX.utils.json_to_sheet(errors);
+        XLSX.utils.book_append_sheet(errorWorkbook, errorSheet, 'Errors');
+        return XLSX.write(errorWorkbook, { bookType: 'xlsx', type: 'buffer' });
+      }
 
-      throw new HttpException(error, 400);
+      return { status: 'success', data: savedUsers };
+    } catch (error) {
+      console.error('Import error:', error);
+      throw new HttpException(error.message || 'Import failed', 400);
     }
+  }
+
+  private _convertExcelDate(excelDate: number): Date | null {
+    if (!excelDate || typeof excelDate !== 'number') return null;
+    const date = new Date(Date.UTC(1900, 0, excelDate - 1)); // Convert Excel serial to JS Date
+    return date;
+  }
+
+  sendExcelFile(res: Response, buffer: Buffer, filename: string): void {
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(buffer);
   }
 
   async updateRole(id, role: string[]): Promise<User> {

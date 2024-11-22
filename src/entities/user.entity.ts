@@ -12,7 +12,7 @@ import { TeacherGroupMember } from './teacher_group_member.entity';
 
 @Entity()
 export class User extends BaseEntity {
-  @Column({ length: 10, unique: true, type: 'char' })
+  @Column({ length: 10, type: 'char' })
   maso: string;
 
   @Column({ length: 50, type: 'varchar' })
@@ -29,6 +29,9 @@ export class User extends BaseEntity {
 
   @Column({ length: 11, type: 'char', nullable: true })
   phone: string;
+
+  @Column({ type: 'date', nullable: true })
+  ngay_sinh: Date;
 
   @Column({ length: 255, type: 'varchar' })
   matkhau: string;

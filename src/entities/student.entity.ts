@@ -7,7 +7,7 @@ import { Group } from './group.entity';
 
 @Entity('student')
 export class Student extends BaseEntity {
-  @Column({ length: 10, unique: true, type: 'char' })
+  @Column({ length: 10, type: 'char' })
   maso: string;
 
   @Column({ length: 50, type: 'varchar' })
