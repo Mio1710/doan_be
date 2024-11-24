@@ -99,13 +99,14 @@ export class AdminController {
   }
 
   @Post('teachers')
-  async createTeacher(@Body() user: CreateUserDTO, @Res() res) {
+  async createTeacher(@Body() user: CreateUserDTO, @Res() res, @Req() req) {
+    user.khoa_id = req.user.khoa_id;
     const { matkhau, ...data } = await this.userService.create(user);
     console.log('matkhau', matkhau);
     return this.responseUtils.success({ data }, res);
   }
 
-  @Put('teachers')
+  @Put('teachers/:id')
   async updateTeacher(@Body() user: UpdateTeacherDto, @Res() res) {
     const { matkhau, ...data } = await this.userService.update(user);
     console.log('matkhau', matkhau);

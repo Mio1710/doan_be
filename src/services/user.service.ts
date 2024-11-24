@@ -10,6 +10,7 @@ import { UpdateResult } from 'typeorm';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { format, parse } from 'date-fns';
 
 // manage teacher/admin
 // need exclude password field
@@ -25,7 +26,19 @@ export class UserService {
   async getLists(options): Promise<User[]> {
     console.log('options query', options.query.query);
 
-    const findQuery = this.userRepository.createQueryBuilder();
+    const findQuery = this.userRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.maso',
+        'user.hodem',
+        'user.ten',
+        'user.email',
+        'user.ngay_sinh',
+        'user.roles',
+        'user.khoa_id',
+        'user.deleted_at',
+      ]);
     const { khoa_id, query } = options.query;
     if (khoa_id) {
       findQuery.andWhere('khoa_id = :khoa_id', { khoa_id });
@@ -50,11 +63,29 @@ export class UserService {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(user.matkhau, saltOrRounds);
     user.matkhau = hash;
+    console.log('user.ngay_sinh', user, user.ngay_sinh);
+    if (user.ngay_sinh) {
+      console.log('user.ngay_sinh start', user.ngay_sinh);
+      user.ngay_sinh = parse(
+        user.ngay_sinh.toString(),
+        'dd/MM/yyyy',
+        new Date(),
+      );
+      console.log('user.ngay_sinh', user.ngay_sinh);
+    }
     return this.userRepository.create(user);
   }
 
   async update(user: UpdateTeacherDto): Promise<User> {
     try {
+      if (user.ngay_sinh) {
+        console.log('user.ngay_sinh start', user.ngay_sinh);
+        user.ngay_sinh = parse(
+          user.ngay_sinh.toString(),
+          'dd/MM/yyyy',
+          new Date(),
+        );
+      }
       return await this.userRepository.update(user);
     } catch (error) {
       throw new HttpException(error, 400);
@@ -110,7 +141,6 @@ export class UserService {
 
       const workbook = XLSX.read(file.buffer, {
         type: 'buffer',
-        cellDates: true,
       });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
@@ -134,7 +164,7 @@ export class UserService {
           if (validationErrors.length > 0) {
             errors.push({
               ...rawUser,
-              ngay_sinh: `${rawUser.ngay_sinh.getDate()}/${rawUser.ngay_sinh.getMonth()}/${rawUser.ngay_sinh.getFullYear()}`,
+              ngay_sinh: rawUser.ngay_sinh,
               error: validationErrors
                 .map((err) => Object.values(err.constraints || {}))
                 .flat()
@@ -145,11 +175,11 @@ export class UserService {
 
           // Check if user already exists
           const isExist = await this.checkExistUser(userInstance.maso);
-          console.log('user isExist', userInstance.maso, isExist);
+          console.log('user isExist', userInstance.ngay_sinh, isExist);
           if (isExist) {
             errors.push({
               ...rawUser,
-              ngay_sinh: `${rawUser.ngay_sinh.getDate() + 1}/${rawUser.ngay_sinh.getMonth() + 1}/${rawUser.ngay_sinh.getFullYear()}`,
+              ngay_sinh: rawUser.ngay_sinh,
               error: 'Người dùng đã tồn tại',
             });
             continue;
@@ -164,6 +194,10 @@ export class UserService {
           userInstance.matkhau = await bcrypt.hash('12345678', 10);
 
           userInstance.khoa_id = khoa_id;
+          userInstance.ngay_sinh = new Date(
+            format(userInstance.ngay_sinh, 'dd/MM/yyyy'),
+          );
+          console.log('userInstance', userInstance);
 
           validUsers.push(userInstance);
         } catch (error) {

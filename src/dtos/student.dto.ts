@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { Optional } from '@nestjs/common';
+import { IsNotEmpty, IsOptional, Length, Matches } from 'class-validator';
 
 export class CreateStudentDto {
   @IsNotEmpty()
@@ -86,4 +87,27 @@ export class StudentInfoDto {
   lop: string;
 
   studentTopic: [];
+}
+
+export class ImportStudentDto {
+  @IsNotEmpty({ message: 'Mã số không được để trống' })
+  maso: string;
+
+  @IsNotEmpty({ message: 'Họ đệm không được để trống' })
+  hodem: string;
+
+  @IsNotEmpty({ message: 'Tên không được để trống' })
+  ten: string;
+
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email: string;
+
+  @Optional()
+  @Matches(/^([0-2][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, {
+    message: 'Ngày sinh không đúng định dạng (dd/MM/yyyy)',
+  })
+  ngay_sinh?: Date;
+
+  matkhau: string;
+  khoa_id: number;
 }

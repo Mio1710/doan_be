@@ -1,10 +1,10 @@
 import { Optional } from '@nestjs/common';
 import {
   IsArray,
-  IsDate,
   IsNotEmpty,
   IsOptional,
   Length,
+  Matches,
 } from 'class-validator';
 
 export class CreateUserDTO {
@@ -34,6 +34,12 @@ export class CreateUserDTO {
   @IsArray()
   @IsOptional()
   roles: string[] = ['teacher'];
+
+  @Optional()
+  @Matches(/^([0-2][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, {
+    message: 'Ngày sinh không đúng định dạng (dd/MM/yyyy)',
+  })
+  ngay_sinh?: Date;
 }
 
 export class UpdateTeacherDto {
@@ -49,7 +55,7 @@ export class UpdateTeacherDto {
   @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   phone: string;
 
   @IsOptional()
@@ -63,6 +69,12 @@ export class UpdateTeacherDto {
   @IsArray()
   @IsOptional()
   roles: string[] = ['teacher'];
+
+  @Optional()
+  @Matches(/^([0-2][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, {
+    message: 'Ngày sinh không đúng định dạng (dd/MM/yyyy)',
+  })
+  ngay_sinh?: Date;
 }
 
 export class ImportUserDto {
@@ -79,8 +91,10 @@ export class ImportUserDto {
   email: string;
 
   @Optional()
-  @IsDate({ message: 'Ngày sinh không đúng định dạng' })
-  ngay_sinh: Date;
+  @Matches(/^([0-2][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, {
+    message: 'Ngày sinh không đúng định dạng (dd/MM/yyyy)',
+  })
+  ngay_sinh?: Date;
 
   @Optional()
   is_admin: number;

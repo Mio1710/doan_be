@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository, UpdateResult } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { StudentSubject } from 'src/entities/studentSubject.entity';
-import { IsNotIn } from 'class-validator';
 
 @Injectable()
 export class StudentService {

@@ -44,7 +44,7 @@ export class UserRepository {
     return await this.userRepository.softDelete(user.id);
   }
 
-  createQueryBuilder() {
-    return this.userRepository.createQueryBuilder();
+  createQueryBuilder(alias?: string) {
+    return this.userRepository.createQueryBuilder(alias);
   }
 }
