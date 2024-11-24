@@ -5,12 +5,8 @@ import {
   Get,
   Param,
   Post,
-  Put,
-  Req,
   Res,
   UseGuards,
-  // UsePipes,
-  // ValidationPipe,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateUserDTO } from 'src/dtos';

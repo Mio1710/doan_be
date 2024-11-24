@@ -35,6 +35,7 @@ export class StudentTopicService {
         ten: true,
         email: true,
         lop: true,
+        phone: true,
         studentTopic: {
           group_id: true,
           topic: {
@@ -93,18 +94,17 @@ export class StudentTopicService {
   async activeSemester(userIds: number[], semester_id: number) {
     console.log('in activeSemester', userIds, semester_id);
 
-    return await this.studentTopicRepository
-      .createQueryBuilder()
-      .insert()
-      .into(StudentTopic)
-      .values(
-        userIds.map((student_id) => ({
+    userIds.map(async (student_id) => {
+      const studentTopic = await this.studentTopicRepository.findOne({
+        where: { student_id, semester_id },
+      });
+      if (!studentTopic) {
+        await this.studentTopicRepository.save({
           student_id,
           semester_id,
-        })),
-      )
-      .orUpdate(['status'], ['student_id', 'semester_id'])
-      .execute();
+        });
+      }
+    });
   }
 
   async update(studentId: number, data): Promise<StudentTopic> {
@@ -147,8 +147,19 @@ export class StudentTopicService {
     return await this.studentTopicRepository.save(studentTopic);
   }
 
-  delete(id: number) {
-    return this.studentRepository.softDelete(id);
+  async delete(student_id: number) {
+    // get student_topic of student
+    const studentTopic = await this.studentTopicRepository.findOne({
+      where: { student_id },
+    });
+    if (!studentTopic) {
+      throw new HttpException('Student not found', 404);
+    }
+    // delete student from group
+    if (studentTopic.group_id) {
+      await this.cancelGroup(student_id);
+    }
+    return this.studentTopicRepository.softDelete(studentTopic.id);
   }
 
   async findOne(options): Promise<StudentTopic> {

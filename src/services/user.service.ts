@@ -95,98 +95,6 @@ export class UserService {
     return this.userRepository.findOne({ maso });
   }
 
-  // async import(file, khoa_id: number) {
-  //   try {
-  //     const requiredHeaders = [
-  //       'STT',
-  //       'maso',
-  //       'hodem',
-  //       'ten',
-  //       'email',
-  //       'ngay_sinh',
-  //       'is_admin',
-  //       'is_super_teacher',
-  //     ];
-
-  //     const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-  //     const workSheet = workbook.Sheets[workbook.SheetNames[0]];
-  //     const headersRow = XLSX.utils.sheet_to_json(workSheet, { header: 1 })[0];
-  //     console.log('Headers:', headersRow);
-  //     if (JSON.stringify(headersRow) !== JSON.stringify(requiredHeaders)) {
-  //       throw new HttpException('File không đúng định dạng', 400);
-  //     }
-  //     const data = XLSX.utils.sheet_to_json(workSheet);
-  //     const errors = [];
-
-  //     const users = await Promise.all(
-  //       data.map(async (user: ImportUserDto) => {
-  //         const userInstance = plainToInstance(ImportUserDto, user);
-  //         const validationErrors = await validate(userInstance);
-  //         if (validationErrors.length > 0) {
-  //           errors.push({
-  //             ...user,
-  //             error: validationErrors,
-  //           });
-  //           return;
-  //         }
-
-  //         const isExist = await this.checkExistUser(user.maso);
-  //         if (isExist) {
-  //           console.log('user isExist', user.maso, isExist);
-  //           errors.push({
-  //             ...user,
-  //             error: 'Người dùng đã tồn tại',
-  //           });
-  //           return;
-  //         }
-  //         console.log('typeof user.ngay_sinh', typeof user.ngay_sinh);
-
-  //         console.log('mã số user', user.maso, user.ngay_sinh);
-
-  //         user.roles = ['teacher'];
-  //         if (user.is_super_teacher == 1) {
-  //           user.roles.push('super_teacher');
-  //         }
-  //         if (user.is_admin == 1) {
-  //           user.roles.push('admin');
-  //         }
-
-  //         const saltOrRounds = 10;
-  //         const hash = await bcrypt.hash('12345678', saltOrRounds);
-  //         user.matkhau = hash;
-  //         console.log('user before create', user);
-  //         // add khoa_id
-  //         user.khoa_id = khoa_id;
-
-  //         try {
-  //           return await this.userRepository.create(user);
-  //         } catch (error) {
-  //           console.log('error create user', user);
-  //           errors.push({
-  //             ...user,
-  //             error: error.message,
-  //           });
-  //         }
-  //       }),
-  //     );
-
-  //     if (errors.length > 0) {
-  //       // return file with error
-  //       const writeBook = XLSX.utils.book_new();
-  //       const writeSheet = XLSX.utils.json_to_sheet(errors);
-
-  //       XLSX.utils.book_append_sheet(writeBook, writeSheet, 'Errors');
-
-  //       return XLSX.write(writeBook, { bookType: 'xlsx', type: 'buffer' });
-  //     }
-
-  //     return { status: 'success', data: users };
-  //   } catch (error) {
-  //     console.log('error is_super_teacheris_super_teacher', error);
-
-  //     throw new HttpException(error, 400);
-  //   }
-  // }
   async import(file, khoa_id: number) {
     try {
       const requiredHeaders = [
@@ -326,6 +234,7 @@ export class UserService {
           ten: true,
           email: true,
           lop: true,
+          phone: true,
           studentTopic: {
             id: true,
             group_id: true,

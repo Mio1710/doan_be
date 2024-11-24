@@ -13,12 +13,12 @@ export class CreateStudentDto {
   @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   phone: string;
 
   @IsOptional()
   @Length(6, 20)
-  matkhau: string = '123456';
+  matkhau: string = '12345678';
   // matkhau: string;
 
   @IsNotEmpty()
@@ -59,4 +59,31 @@ export class UpdateStudentTopicDto {
 
   @IsOptional()
   topic_id?: number;
+}
+
+export class StudentInfoDto {
+  @IsNotEmpty()
+  maso: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  hodem: string;
+
+  @IsNotEmpty()
+  @Length(1, 500)
+  ten: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  email: string;
+
+  @IsOptional()
+  @Length(1, 11)
+  phone: string;
+
+  @IsNotEmpty()
+  @Length(1, 15)
+  lop: string;
+
+  studentTopic: [];
 }

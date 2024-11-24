@@ -4,9 +4,10 @@ import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository, UpdateResult } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { StudentSubject } from 'src/entities/studentSubject.entity';
+import { IsNotIn } from 'class-validator';
 
 @Injectable()
 export class StudentService {
@@ -38,6 +39,24 @@ export class StudentService {
 
   update(student: Student): Promise<Student> {
     return this.studentepository.save(student);
+  }
+
+  async updateInfo(body): Promise<UpdateResult> {
+    // check if the student exists
+    const student = await this.studentepository.findOne({
+      where: { maso: body.maso, id: Not(body.id) },
+    });
+    if (student) {
+      throw new HttpException('Mã số sinh viên đã tồn tại', 400);
+    }
+    return await this.studentepository.update(body.id, {
+      ten: body.ten,
+      hodem: body.hodem,
+      lop: body.lop,
+      maso: body.maso,
+      email: body.email,
+      phone: body.phone,
+    });
   }
 
   delete(id: number) {

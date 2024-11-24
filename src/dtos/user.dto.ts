@@ -1,24 +1,11 @@
 import { Optional } from '@nestjs/common';
-import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsDate,
   IsNotEmpty,
   IsOptional,
   Length,
-  Matches,
 } from 'class-validator';
-
-// export class CreateUserDTO {
-//   maso: string;
-//   hodem: string;
-//   ten: string;
-//   email: string;
-//   matkhau: string;
-//   phone: string;
-//   types: string[];
-//   facultyId?: number;
-// }
 
 export class CreateUserDTO {
   @IsNotEmpty()
