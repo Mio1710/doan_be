@@ -8,7 +8,7 @@ import { Group } from './group.entity';
 
 @Entity('student')
 export class Student extends BaseEntity {
-  @Column({ length: 10, unique: true, type: 'char' })
+  @Column({ length: 10, type: 'char' })
   maso: string;
 
   @Column({ length: 50, type: 'varchar' })
@@ -17,7 +17,7 @@ export class Student extends BaseEntity {
   @Column({ length: 50, type: 'varchar' })
   ten: string;
 
-  @Column({ length: 50, type: 'char', nullable: true })
+  @Column({ length: 100, type: 'char', nullable: true })
   hinhanh?: string;
 
   @Column({ length: 50, type: 'char' })
@@ -39,7 +39,9 @@ export class Student extends BaseEntity {
   @JoinColumn({ name: 'khoa_id' })
   facutily: Faculty;
 
-  @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.student)
+  @OneToMany(() => StudentTopic, (studentTopic) => studentTopic.student, {
+    onUpdate: 'NO ACTION',
+  })
   studentTopic: StudentTopic[];
 
   @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student)

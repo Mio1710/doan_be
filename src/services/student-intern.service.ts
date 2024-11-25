@@ -26,32 +26,49 @@ export class StudentInternService {
   async getLists(khoa_id, params): Promise<Student[]> {
     const semester = await this.semesterService.getActiveSemester();
     const options = {
-        select: {
-            id: true,
-            maso: true,
-            hodem: true,
-            ten: true,
-            email: true,
-            lop: true,
-            // studentIntern:  {
-            //   intern_staus: true,
-            // }     
-          },
-        where: {
-            khoa_id,
-            studentIntern: {
-              status: 'new',
-              semester: { id: semester.id },
-            },
+//         select: {
+//             id: true,
+//             maso: true,
+//             hodem: true,
+//             ten: true,
+//             email: true,
+//             lop: true,
+//             // studentIntern:  {
+//             //   intern_staus: true,
+//             // }     
+//           },
+//         where: {
+//             khoa_id,
+//             studentIntern: {
+//               status: 'new',
+//               semester: { id: semester.id },
+//             },
+      select: {
+        id: true,
+        maso: true,
+        hodem: true,
+        ten: true,
+        email: true,
+        lop: true,
+        // studentIntern:  {
+        //   intern_staus: true,
+        // }
+      },
+      where: {
+        khoa_id,
+        studentIntern: {
+          intern_status: 'new',
+          semester: { id: semester.id },
         },
-        relations: ['studentIntern'],
+      },
+      relations: ['studentIntern'],
     };
 
     console.log('options1111', options, params);
 
     return this.studentRepository.find({ ...options });
   }
-  
+
   async find(options): Promise<StudentIntern[]> {
     return this.studentInternRepository.find(options);
   }
@@ -97,29 +114,29 @@ export class StudentInternService {
     try {
       const studentIntern = await this.findOne({ student_id: studentId });
 
-    //   const getPartnerTopic = await this.studentInternRepository.findOne({
-    //     where: { student_id: data.partner_id },
-    //   });
-    //   studentIntern.topic_id = data.topic_id;
-    //   if (data.partner_id) {
-    //     const group = {
-    //       firstPartner: { id: studentId },
-    //       secondPartner: { id: getPartnerTopic.id },
-    //     };
-    //     // const newGroup = await this.groupRepository.save(group);
-    //     this.studentInternRepository
-    //       .createQueryBuilder()
-    //       .update(StudentIntern)
-    //       .set({ group_id: newGroup.id })
-    //       .where('student_id IN (:...studentId)', {
-    //         studentId: [studentId, data.partner_id],
-    //       })
-    //       .execute();
-    //   }
-    //   if (data.user_ids) {
-    //     // cancel group
-    //     await this.cancelGroup(studentId);
-    //   }
+      //   const getPartnerTopic = await this.studentInternRepository.findOne({
+      //     where: { student_id: data.partner_id },
+      //   });
+      //   studentIntern.topic_id = data.topic_id;
+      //   if (data.partner_id) {
+      //     const group = {
+      //       firstPartner: { id: studentId },
+      //       secondPartner: { id: getPartnerTopic.id },
+      //     };
+      //     // const newGroup = await this.groupRepository.save(group);
+      //     this.studentInternRepository
+      //       .createQueryBuilder()
+      //       .update(StudentIntern)
+      //       .set({ group_id: newGroup.id })
+      //       .where('student_id IN (:...studentId)', {
+      //         studentId: [studentId, data.partner_id],
+      //       })
+      //       .execute();
+      //   }
+      //   if (data.user_ids) {
+      //     // cancel group
+      //     await this.cancelGroup(studentId);
+      //   }
 
       console.log('studentIntern11111', data, studentIntern);
 
@@ -199,5 +216,4 @@ export class StudentInternService {
       throw new HttpException(error, 400);
     }
   }
-
 }

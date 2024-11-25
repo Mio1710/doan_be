@@ -1,4 +1,11 @@
-import { Entity, ManyToOne, JoinColumn, Column, Index } from 'typeorm';
+import {
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  Column,
+  Index,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Student } from './student.entity';
 import { Topic } from './topic.entity';
 import { Semester } from './semester.entity';
@@ -6,7 +13,9 @@ import { BaseEntity } from './base.entity';
 import { Group } from './group.entity';
 
 @Entity('student_topics')
-@Index('IDX_student_semester', ['student_id', 'semester_id'], { unique: true })
+@Index('IDX_student_semester', ['student_id', 'semester_id', 'deleted_at'], {
+  unique: true,
+})
 export class StudentTopic extends BaseEntity {
   @Column({ name: 'student_id' })
   student_id: number;
@@ -41,4 +50,7 @@ export class StudentTopic extends BaseEntity {
 
   @Column({ default: 1 })
   khoa_id: number;
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deleted_at: Date;
 }
