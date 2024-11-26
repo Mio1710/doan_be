@@ -1,11 +1,21 @@
-import { Entity, ManyToOne, OneToOne ,JoinColumn, Column, Index } from 'typeorm';
+import { 
+  Entity, 
+  ManyToOne, 
+  OneToOne, 
+  JoinColumn, 
+  Column, 
+  Index, 
+  DeleteDateColumn, 
+} from 'typeorm';
 import { Student } from './student.entity';
 import { Semester } from './semester.entity';
 import { BaseEntity } from './base.entity';
 import { Intern } from './intern.entity';
 
 @Entity('student_intern')
-@Index('IDX_student_semester', ['student_id', 'semester_id'], { unique: true })
+@Index('IDX_student_semester', ['student_id', 'semester_id', 'deleted_at'], { 
+  unique: true, 
+})
 export class StudentIntern extends BaseEntity {
   @Column({ name: 'student_id' })
   student_id: number;
@@ -33,5 +43,8 @@ export class StudentIntern extends BaseEntity {
   @OneToOne(() => Intern)
   @JoinColumn({ name: 'intern_id' })
   intern: Intern;
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deleted_at: Date;
 
 }

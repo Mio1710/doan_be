@@ -63,13 +63,13 @@ export class UpdateStudentTopicDto {
   topic_id?: number;
 }
 
-// export class UpdateStudentInternDto {
-//   @IsOptional()
-//   student_intern_id?: number;
+export class UpdateStudentInternDto {
+  @IsOptional()
+  student_intern_id?: number;
 
-//   @IsOptional()
-//   intern_id?: number;
-// }
+  @IsOptional()
+  intern_id?: number;
+}
 
 export class StudentInfoDto {
   @IsNotEmpty()
@@ -96,6 +96,33 @@ export class StudentInfoDto {
   lop: string;
 
   studentTopic: [];
+}
+
+export class StudentInternInfoDto {
+  @IsNotEmpty()
+  maso: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  hodem: string;
+
+  @IsNotEmpty()
+  @Length(1, 500)
+  ten: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  email: string;
+
+  @IsOptional()
+  @Length(1, 11)
+  phone: string;
+
+  @IsNotEmpty()
+  @Length(1, 15)
+  lop: string;
+
+  studentIntern: [];
 }
 
 export class ImportStudentDto {

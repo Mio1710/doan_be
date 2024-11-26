@@ -44,7 +44,9 @@ export class Student extends BaseEntity {
   })
   studentTopic: StudentTopic[];
 
-  @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student)
+  @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student, {
+    onUpdate: 'NO ACTION',
+  })
   studentIntern: StudentIntern[];
 
   @ManyToOne(() => Group)

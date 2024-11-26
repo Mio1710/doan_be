@@ -14,7 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateStudentDto, UpdateStudentInternDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { SemesterService, StudentInternService } from 'src/services';
+import { StudentInternService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 
 @UseGuards(AuthGuard, RolesGuard)
@@ -22,7 +22,6 @@ import { ResponseUtils } from 'src/utils';
 export class StudentInternController {
   constructor(
     private readonly studentInternService: StudentInternService,
-    private readonly semesterService: SemesterService,
     private readonly responseUtils: ResponseUtils,
   ) {}
 
@@ -44,11 +43,14 @@ export class StudentInternController {
   @Post('import')
   @UseInterceptors(FileInterceptor('file'))
   async importTeacher(@UploadedFile() students, @Res() res, @Req() req) {
-    console.log('students students students students students', students);
     const khoa_id = req.user.khoa_id;
 
     const data = await this.studentInternService.import(students, khoa_id);
-    return this.responseUtils.success({ data }, res);
+    if (data.status === 'success') {
+      return this.responseUtils.success({ data }, res);
+    } else {
+      this.studentInternService.sendExcelFile(res, data, 'error_student.xlsx');
+    }
   }
 
   @Post('intern')

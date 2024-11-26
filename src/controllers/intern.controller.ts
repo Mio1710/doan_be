@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateInternDto } from 'src/dtos';
@@ -99,6 +100,12 @@ export class InternController {
 
     const data = await this.internService.checkIntern(id, status);
     console.log('intern data', data);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Delete(':id')
+  async deleteIntern(@Param('id') id: number, @Res() res) {
+    const data = await this.internService.delete(id);
     return this.responseUtils.success({ data }, res);
   }
 }

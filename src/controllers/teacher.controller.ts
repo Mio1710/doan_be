@@ -33,6 +33,13 @@ export class TeacherController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Get('student-intern')
+  async getStudentIntern(@Res() res, @Req() req) {
+    const teacher_id = req.user.id;
+    const data = await this.userService.getStudentIntern(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
   @Get('student-topic/result')
   async getStudentTopicResult(@Res() res, @Req() req) {
     const teacher_id = req.user.id;
