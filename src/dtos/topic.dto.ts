@@ -15,7 +15,7 @@ export class ReportTopicDto {
   week: number;
 
   // @IsNotEmpty()
-  file: string;
+  file;
 
   @IsNotEmpty()
   description: string;
@@ -26,5 +26,7 @@ export class ReportTopicDto {
   @IsEmpty()
   student_topic_id: number;
 
-  file_path: string;
+  file_key: string;
+
+  file_name: string;
 }

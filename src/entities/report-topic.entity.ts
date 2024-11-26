@@ -8,7 +8,13 @@ export class ReportTopic extends BaseEntity {
   week: number;
 
   @Column({ type: 'varchar', length: 255 })
-  file_path: string;
+  file_key: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  file_name: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  comment: string;
 
   @Column({ type: 'nvarchar', length: 1000 })
   description: string;

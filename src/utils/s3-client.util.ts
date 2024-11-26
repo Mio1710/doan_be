@@ -1,11 +1,9 @@
 import {
-  GetObjectAclCommandOutput,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import * as dotenv from 'dotenv';
-import * as stream from 'stream';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -23,11 +21,10 @@ const s3 = new S3Client({
   },
 });
 
-export async function uploadFile(body, prefix) {
-  const fileName = `${prefix}/${body.file_key}`;
+export async function uploadFile(body, fileKey) {
   const params = {
     Bucket: bucketName,
-    Key: fileName,
+    Key: fileKey,
     Body: body.file.buffer,
     ContentType: body.file.mimetype,
   };

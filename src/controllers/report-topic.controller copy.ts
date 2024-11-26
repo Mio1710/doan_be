@@ -12,7 +12,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createReadStream } from 'fs';
 import { ReportTopicDto } from 'src/dtos';
 import { ReportTopicService } from 'src/services';
 import { ResponseUtils } from 'src/utils';

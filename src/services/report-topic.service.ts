@@ -7,6 +7,7 @@ import { SemesterService } from './semester.service';
 import * as crypto from 'crypto';
 // import { S3ClientUtil } from 'src/utils/s3-client.util';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { downloadFile, uploadFile } from 'src/utils/s3-client.util';
 
 const bucketName = process.env.BUCKET_NAME;
 const region = process.env.BUCKET_REGION;
@@ -35,23 +36,12 @@ export class ReportTopicService {
     const studentTopic = await this.getStudentTopic(reportTopic.student_id);
 
     reportTopic.student_topic_id = studentTopic.id;
-    reportTopic.file_path = randomName();
-    await this.uploadFile(reportTopic);
+    reportTopic.file_key = `topic/${randomName()}`;
+    reportTopic.file_name = reportTopic.file.originalname;
+    await uploadFile(reportTopic, reportTopic.file_key);
 
     // delete reportTopic.student_id;
     return await this.reportTopicRepository.save(reportTopic);
-  }
-
-  async uploadFile(body) {
-    const params = {
-      Bucket: bucketName,
-      Key: body.file_path,
-      Body: body.file.buffer,
-      ContentType: body.file.mimetype,
-    };
-
-    const command = new PutObjectCommand(params);
-    await s3Client.send(command);
   }
 
   async getLists(options): Promise<ReportTopic[]> {
@@ -76,5 +66,9 @@ export class ReportTopicService {
       student_id,
       semester_id: activeSemester.id,
     });
+  }
+
+  async downloadFile(fileKey: string) {
+    return await downloadFile(fileKey);
   }
 }
