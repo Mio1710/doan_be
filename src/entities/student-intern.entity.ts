@@ -6,11 +6,13 @@ import {
   Column, 
   Index, 
   DeleteDateColumn, 
+  OneToMany,
 } from 'typeorm';
 import { Student } from './student.entity';
 import { Semester } from './semester.entity';
 import { BaseEntity } from './base.entity';
 import { Intern } from './intern.entity';
+import { ReportIntern } from './report-intern.entity';
 
 @Entity('student_intern')
 @Index('IDX_student_semester', ['student_id', 'semester_id', 'deleted_at'], { 
@@ -46,5 +48,8 @@ export class StudentIntern extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deleted_at: Date;
+
+  @OneToMany(() => ReportIntern, (reportIntern) => reportIntern.studentIntern)
+  reportInterns: ReportIntern[];
 
 }

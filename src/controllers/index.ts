@@ -16,4 +16,5 @@ export * from './intern.controller';
 export * from './teacher-intern.controller';
 export * from './student-teacher.controller'
 export * from './report-topic.controller';
+export * from './report-intern.controller';
 
