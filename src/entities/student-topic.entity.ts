@@ -5,12 +5,14 @@ import {
   Column,
   Index,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Student } from './student.entity';
 import { Topic } from './topic.entity';
 import { Semester } from './semester.entity';
 import { BaseEntity } from './base.entity';
 import { Group } from './group.entity';
+import { ReportTopic } from './report-topic.entity';
 
 @Entity('student_topics')
 @Index('IDX_student_semester', ['student_id', 'semester_id', 'deleted_at'], {
@@ -53,4 +55,7 @@ export class StudentTopic extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deleted_at: Date;
+
+  @OneToMany(() => ReportTopic, (reportTopic) => reportTopic.studentTopic)
+  reportTopics: ReportTopic[];
 }
