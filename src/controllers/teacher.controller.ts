@@ -11,7 +11,7 @@ import {
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { ResultService, UserService } from 'src/services';
+import { ReportTopicService, ResultService, UserService } from 'src/services';
 import { ResponseUtils } from 'src/utils/response.util';
 
 @Controller('teachers')
@@ -20,6 +20,7 @@ import { ResponseUtils } from 'src/utils/response.util';
 export class TeacherController {
   constructor(
     private readonly userService: UserService,
+    private readonly reportTopicService: ReportTopicService,
     private readonly resultService: ResultService,
     private readonly responseUtils: ResponseUtils,
   ) {
@@ -37,6 +38,15 @@ export class TeacherController {
   async getStudentTopicResult(@Res() res, @Req() req) {
     const teacher_id = req.user.id;
     const data = await this.userService.getStudentTopic(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Get('student-topic/report')
+  async getStudentTopicReport(@Res() res, @Req() req, @Query() query) {
+    const studentId = query.studentId;
+    const data = await this.reportTopicService.getLists({
+      student_id: studentId,
+    });
     return this.responseUtils.success({ data }, res);
   }
 
