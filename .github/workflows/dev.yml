@@ -15,22 +15,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Deploy to EC2
-      uses: easingthemes/ssh-deploy@main
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-        REMOTE_HOST: ${{ secrets.HOST_DNS }}
-        REMOTE_USER: ${{ secrets.USERNAME }}
-        TARGET: ${{ secrets.TARGET_DIR }}
     
-    - name: Run in bash ec2
-      run: pwd
-    - run: echo 'start trigger'
-    - name: Access backend serivice
-      run: ls
-    - name: check pm2
-      run: whereis pm2
+    - name: Setup Nodejs
+      uses: actions/setup-node@v4
+      with: 
+        node-version: '20.x'
+        cache: 'npm'
     - name: Install dependencies
-      run: npm install
+      run: npm ci
     - name: Run
       run: pm2 restart doan_be
