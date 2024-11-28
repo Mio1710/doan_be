@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpException,
     Param,
     Post,
     Put,
@@ -14,7 +15,7 @@ import {
     UseInterceptors,
   } from '@nestjs/common';
   import { FileInterceptor } from '@nestjs/platform-express';
-  import { ReportInternDto } from 'src/dtos';
+  import { ReportInternDto, UpdateReportInternDto } from 'src/dtos';
   import { AuthGuard } from 'src/guards/auth.guard';
   import { ReportInternService } from 'src/services';
   import { ResponseUtils } from 'src/utils';
@@ -36,6 +37,9 @@ import {
       @Res() res,
       @Req() req,
     ) {
+      if (!file) {
+        throw new HttpException('File không được để trống', 400);
+      }
       reportIntern.file = file;
       reportIntern.student_id = req.user.id;
       console.log('reportIntern', reportIntern);
@@ -46,8 +50,11 @@ import {
     }
   
     @Get()
-    async getListReportInterns(@Res() res) {
-      const data = await this.reportInternService.getLists({});
+    async getListReportInterns(@Res() res, @Req() req) {
+      const studentId = req.user.id;
+      const data = await this.reportInternService.getLists({
+        student_id: studentId,
+      });
       return this.responseUtils.success({ data }, res);
     }
   
@@ -67,11 +74,14 @@ import {
     }
   
     @Put(':id')
+    @UseInterceptors(FileInterceptor('file'))
     async updateReportTopic(
+      @UploadedFile() file,
       @Body() reportIntern: ReportInternDto,
       @Res() res,
-      @Param() id: number,
+      @Param('id') id: number,
     ) {
+      reportIntern.file = file;
       const data = await this.reportInternService.update(id, reportIntern);
       return this.responseUtils.success({ data }, res);
     }

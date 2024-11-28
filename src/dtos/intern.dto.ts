@@ -23,7 +23,27 @@ export class ReportInternDto {
   @IsEmpty()
   student_id: number;
 
+  // @IsEmpty()
+  student_intern_id: number;
+
+  file_key: string;
+
+  file_name: string;
+}
+
+export class UpdateReportInternDto {
+  @IsNotEmpty()
+  week: number;
+
+  file;
+
+  @IsNotEmpty()
+  description: string;
+
   @IsEmpty()
+  student_id: number;
+
+  // @IsEmpty()
   student_intern_id: number;
 
   file_key: string;
