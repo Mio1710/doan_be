@@ -21,6 +21,8 @@ jobs:
         node-version: '20.x'
     - name: Access backend serivice
       run: cd doan_be
+    - name: Check log
+      run: pwd
     - name: Install dependencies
       run: npm install
     - name: Run
