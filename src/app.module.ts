@@ -21,7 +21,7 @@ import * as ListUtils from './utils';
 import { BaseSubscriber } from './subscribers/base.subscribe';
 import { config } from 'dotenv';
 config();
-console.log('env', process.env);
+console.log('env', process.env.DB_NAME);
 
 
 @Module({
