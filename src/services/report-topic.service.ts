@@ -1,25 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReportTopicDto } from 'src/dtos';
 import { ReportTopic, StudentTopic } from 'src/entities';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { StudentTopicService } from './student-topic.service';
 import { SemesterService } from './semester.service';
 import * as crypto from 'crypto';
-// import { S3ClientUtil } from 'src/utils/s3-client.util';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { downloadFile, uploadFile } from 'src/utils/s3-client.util';
-
-const bucketName = process.env.BUCKET_NAME;
-const region = process.env.BUCKET_REGION;
-const accessKeyId = process.env.ACCESS_KEY;
-const secretAccessKey = process.env.SECRET_ACCESS_KEY;
-const s3Client = new S3Client({
-  region,
-  credentials: {
-    accessKeyId,
-    secretAccessKey,
-  },
-});
+import { deleteFile, downloadFile, uploadFile } from 'src/utils/s3-client.util';
+import { HttpException } from '@nestjs/common';
 
 const randomName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
@@ -33,27 +20,71 @@ export class ReportTopicService {
   ) {}
 
   async create(reportTopic: ReportTopicDto): Promise<ReportTopic> {
-    const studentTopic = await this.getStudentTopic(reportTopic.student_id);
+    try {
+      const studentTopic = await this.getStudentTopic(reportTopic.student_id);
+      // check if have report with week
+      const checkReport = await this.reportTopicRepository.findOne({
+        where: { week: reportTopic.week, student_topic_id: studentTopic.id },
+      });
+      console.log('checkReport', checkReport);
 
-    reportTopic.student_topic_id = studentTopic.id;
-    reportTopic.file_key = `topic/${randomName()}`;
-    reportTopic.file_name = reportTopic.file.originalname;
-    await uploadFile(reportTopic, reportTopic.file_key);
+      if (checkReport) {
+        throw new HttpException(
+          `Báo cáo tuần ${reportTopic.week} đã tồn tại`,
+          400,
+        );
+      }
 
-    // delete reportTopic.student_id;
-    return await this.reportTopicRepository.save(reportTopic);
+      reportTopic.student_topic_id = studentTopic.id;
+      reportTopic.file_key = `topic/${randomName()}`;
+      reportTopic.file_name = reportTopic.file.originalname;
+      await uploadFile(reportTopic, reportTopic.file_key);
+
+      return await this.reportTopicRepository.save({
+        week: reportTopic.week,
+        file_key: reportTopic.file_key,
+        file_name: reportTopic.file_name,
+        description: reportTopic.description,
+        student_topic_id: reportTopic.student_topic_id,
+      });
+    } catch (error) {
+      throw new HttpException(error, 500);
+    }
   }
 
   async getLists(options): Promise<ReportTopic[]> {
-    return await this.reportTopicRepository.find({ ...options });
+    const studentId = options.student_id;
+    const studentTopic = await this.getStudentTopic(studentId);
+    return await this.reportTopicRepository.find({
+      where: { student_topic_id: studentTopic.id },
+      order: { created_at: 'DESC' },
+    });
   }
 
   async findOne(options): Promise<ReportTopic> {
     return await this.reportTopicRepository.findOne({ ...options });
   }
 
-  async update(id: number, reportTopic: ReportTopicDto): Promise<ReportTopic> {
-    return await this.reportTopicRepository.save(reportTopic);
+  async update(id: number, reportTopic: ReportTopicDto): Promise<UpdateResult> {
+    const data = {};
+    console.log('id', id);
+
+    const currentReportTopic = await this.findOne({ where: { id } });
+    if (reportTopic.file) {
+      this.deleteFile(currentReportTopic.file_key);
+      this.uploadFile(reportTopic);
+      data['file_key'] = reportTopic.file_key;
+      data['file_name'] = reportTopic.file_name;
+    }
+    data['week'] = reportTopic.week;
+    data['description'] = reportTopic.description;
+
+    return await this.reportTopicRepository
+      .createQueryBuilder()
+      .update()
+      .set(data)
+      .where({ id })
+      .execute();
   }
 
   async delete(id: number) {
@@ -70,5 +101,14 @@ export class ReportTopicService {
 
   async downloadFile(fileKey: string) {
     return await downloadFile(fileKey);
+  }
+  async uploadFile(reportTopic: ReportTopicDto) {
+    reportTopic.file_key = `topic/${randomName()}`;
+    reportTopic.file_name = reportTopic.file.originalname;
+    await uploadFile(reportTopic, reportTopic.file_key);
+  }
+
+  async deleteFile(fileKey: string) {
+    return await deleteFile(fileKey);
   }
 }

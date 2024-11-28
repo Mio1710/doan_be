@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -41,4 +42,14 @@ export async function downloadFile(key: string) {
 
   const command = new GetObjectCommand(params);
   return await s3.send(command);
+}
+
+export async function deleteFile(key: string) {
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+  };
+
+  const command = new DeleteObjectCommand(params);
+  await s3.send(command);
 }

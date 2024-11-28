@@ -23,7 +23,27 @@ export class ReportTopicDto {
   @IsEmpty()
   student_id: number;
 
+  // @IsEmpty()
+  student_topic_id: number;
+
+  file_key: string;
+
+  file_name: string;
+}
+
+export class UpdateReportTopicDto {
+  @IsNotEmpty()
+  week: number;
+
+  file;
+
+  @IsNotEmpty()
+  description: string;
+
   @IsEmpty()
+  student_id: number;
+
+  // @IsEmpty()
   student_topic_id: number;
 
   file_key: string;
