@@ -23,7 +23,7 @@ jobs:
       run: pwd
     - run: echo 'start trigger'
     - name: Access backend serivice
-      run: cd doan_be
+      run: ls
     - name: Install dependencies
       run: npm install
     - name: Run
