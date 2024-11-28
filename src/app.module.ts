@@ -19,6 +19,10 @@ import { RequestInterceptor } from './interceptors/request.interceptor';
 // import { RolesGuard } from './guards/roles.guard';
 import * as ListUtils from './utils';
 import { BaseSubscriber } from './subscribers/base.subscribe';
+import { config } from 'dotenv';
+config();
+console.log('env', process.env);
+
 
 @Module({
   imports: [
