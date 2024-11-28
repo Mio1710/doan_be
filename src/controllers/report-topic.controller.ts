@@ -21,7 +21,7 @@ import { ReportTopicService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
 import * as stream from 'stream';
 
-@Controller('report-topic')
+@Controller('report-topics')
 @UseGuards(AuthGuard)
 export class ReportTopicController {
   constructor(
