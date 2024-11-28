@@ -23,4 +23,13 @@ jobs:
         REMOTE_USER: ${{ secrets.USERNAME }}
         TARGET: ${{ secrets.TARGET_DIR }}
     - name: Run in bash ec2
-      run: ./deploy_be.sh
+      run: pwd
+    - run: echo 'start trigger'
+    - name: Access backend serivice
+      run: ls
+    - name: check pm2
+      run: whereis pm2
+    - name: Install dependencies
+      run: npm install
+    - name: Run
+      run: pm2 restart doan_be
