@@ -24,6 +24,8 @@ jobs:
     - run: echo 'start trigger'
     - name: Access backend serivice
       run: ls
+    - name: check pm2
+      run: whereis pm2
     - name: Install dependencies
       run: npm install
     - name: Run
