@@ -65,6 +65,17 @@ export class ReportTopicService {
     return await this.reportTopicRepository.findOne({ ...options });
   }
 
+  async commentReportTopic(id: number, comment: string): Promise<UpdateResult> {
+    console.log('commentcomment', comment);
+    
+    return await this.reportTopicRepository
+      .createQueryBuilder()
+      .update()
+      .set({ comment })
+      .where({ id })
+      .execute();
+  }
+
   async update(id: number, reportTopic: ReportTopicDto): Promise<UpdateResult> {
     const data = {};
     console.log('id', id);

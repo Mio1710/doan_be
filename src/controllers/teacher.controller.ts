@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Put,
   Query,
   Req,
@@ -51,7 +52,7 @@ export class TeacherController {
 
   @Get('student-topic/report')
   async getStudentTopicReport(@Res() res, @Req() req, @Query() query) {
-    const studentId = query.studentId;
+    const studentId = query?.filter?.studentId;
     const data = await this.reportTopicService.getLists({
       student_id: studentId,
     });
@@ -64,6 +65,31 @@ export class TeacherController {
     const data = await this.reportInternService.getLists({
       student_id: studentId,
     });
+  }  
+
+  @Put('student-topic/report/:id/comment')
+  async updateStudentTopicReport(
+    @Res() res,
+    @Body('comment') body,
+    @Param('id') reportId,
+  ) {
+    const data = await this.reportTopicService.commentReportTopic(
+      reportId,
+      body,
+    );
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('student-intern/report/:id/comment')
+  async updateStudentInternReport(
+    @Res() res,
+    @Body('comment') body,
+    @Param('id') reportId,
+  ) {
+    const data = await this.reportInternService.commentReportIntern(
+      reportId,
+      body,
+    );
     return this.responseUtils.success({ data }, res);
   }
 
