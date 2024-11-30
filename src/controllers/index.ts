@@ -13,3 +13,5 @@ export * from './result.controller';
 export * from './admin.controller';
 export * from './teacher-group.controller';
 export * from './report-topic.controller';
+export * from './public.controller';
+export * from './recommend-topic.controller';

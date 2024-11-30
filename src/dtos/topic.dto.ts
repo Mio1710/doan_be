@@ -50,3 +50,17 @@ export class UpdateReportTopicDto {
 
   file_name: string;
 }
+
+export class CreateRecommendTopicDto {
+  @IsNotEmpty()
+  ten: string;
+
+  @IsNotEmpty()
+  teacher_id: number;
+
+  @IsNotEmpty()
+  knowledge: string;
+
+  @IsNotEmpty()
+  description: string;
+}

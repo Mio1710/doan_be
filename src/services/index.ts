@@ -11,3 +11,4 @@ export * from './lo.service';
 export * from './result.service';
 export * from './teacher-group.service';
 export * from './report-topic.service';
+export * from './recommend-topic.service';
