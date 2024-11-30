@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Semester, Intern } from '../entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { ListInternQuery } from 'src/interfaces/queries/listIntern.interface';
 import { SemesterService } from './semester.service';
@@ -29,7 +29,6 @@ export class InternService {
     private readonly semesterService: SemesterService,
     private readonly cls: ClsService,
   ) {}
-
 
   async getLists(options?: ListInternQuery): Promise<Intern[]> {
     let semester_id = options?.semester_id;
@@ -66,7 +65,7 @@ export class InternService {
         'student.maso',
         'user.id',
         'user.hodem',
-        'user.ten'
+        'user.ten',
       ]);
 
     // add condition
@@ -74,7 +73,7 @@ export class InternService {
       .where('semester.semester_id = :semester_id', { semester_id })
       .andWhere('intern.khoa_id = :khoa_id', { khoa_id });
 
-     //Lấy danh sách thực tập theo giảng viên được đăng ký
+    //Lấy danh sách thực tập theo giảng viên được đăng ký
     // query.andWhere('intern.teacher_id = :userID', { userID });
 
     if (!viewAll) {
@@ -111,9 +110,16 @@ export class InternService {
     return await this.internRepository.update(id, intern);
   }
 
-  async delete(id: number): Promise<Intern[]> {
-    const intern = await this.internRepository.find({ where: { id } });
-    return await this.internRepository.remove(intern);
+  async delete(id: number) {
+    const intern = await this.internRepository.findOne({ where: { id } });
+    console.log('itern', intern);
+
+    return await this.internRepository
+      .createQueryBuilder()
+      .softDelete()
+      .from(Intern)
+      .where('id = :id', { id })
+      .execute();
   }
 
   async findOne(options): Promise<Intern> {
@@ -239,6 +245,5 @@ export class InternService {
         })),
       )
       .execute();
-
   }
 }

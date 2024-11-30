@@ -9,17 +9,6 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { deleteFile, downloadFile, uploadFile } from 'src/utils/s3-client.util';
 import { HttpException } from '@nestjs/common';
 
-// const bucketName = process.env.BUCKET_NAME;
-// const region = process.env.BUCKET_REGION;
-// const accessKeyId = process.env.ACCESS_KEY;
-// const secretAccessKey = process.env.SECRET_ACCESS_KEY;
-// const s3Client = new S3Client({
-//   region,
-//   credentials: {
-//     accessKeyId,
-//     secretAccessKey,
-//   },
-// });
 
 const randomName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
@@ -32,17 +21,6 @@ export class ReportInternService {
     // private readonly s3ClientUtils: S3ClientUtil,
   ) {}
 
-  // async create(reportIntern: ReportInternDto): Promise<ReportIntern> {
-  //   const studentIntern = await this.getStudentIntern(reportIntern.student_id);
-
-  //   reportIntern.student_intern_id = studentIntern.id;
-  //   reportIntern.file_key = `intern/${randomName()}`;
-  //   reportIntern.file_name = reportIntern.file.originalname;
-  //   await uploadFile(reportIntern, reportIntern.file_key);
-
-  //   // delete reportIntern.student_id;
-  //   return await this.reportInternRepository.save(reportIntern);
-  // }
   async create(reportIntern: ReportInternDto): Promise<ReportIntern> {
     try {
       const studentIntern = await this.getStudentIntern(reportIntern.student_id);
@@ -92,9 +70,18 @@ export class ReportInternService {
     return await this.reportInternRepository.findOne({ ...options });
   }
 
-  // async update(id: number, reportIntern: ReportInternDto): Promise<ReportIntern> {
-  //   return await this.reportInternRepository.save(reportIntern);
-  // }
+
+  async commentReportIntern(id: number, comment: string): Promise<UpdateResult> {
+    console.log('commentcomment', comment);
+    
+    return await this.reportInternRepository
+      .createQueryBuilder()
+      .update()
+      .set({ comment })
+      .where({ id })
+      .execute();
+  }
+
   async update(id: number, reportIntern: ReportInternDto): Promise<UpdateResult> {
     const data = {};
     console.log('id', id);

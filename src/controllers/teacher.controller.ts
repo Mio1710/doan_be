@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Put,
   Query,
@@ -61,7 +62,12 @@ export class TeacherController {
 
   @Get('student-intern/report')
   async getStudentInternReport(@Res() res, @Req() req, @Query() query) {
-    const studentId = query.studentId;
+    const studentId = query?.filter?.studentId;
+    console.log('studentId', studentId, query);
+    
+    if (!studentId) {
+      throw new HttpException('Student id is required', 400);
+    }
     const data = await this.reportInternService.getLists({
       student_id: studentId,
     });
