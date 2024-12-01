@@ -60,6 +60,8 @@ export class ReportInternService {
   async getLists(options): Promise<ReportIntern[]> {
     const studentId = options.student_id;
     const studentIntern = await this.getStudentIntern(studentId);
+    console.log('studentIntern', studentId, studentIntern);
+    
     return await this.reportInternRepository.find({
       where: { student_intern_id: studentIntern.id },
       order: { created_at: 'DESC' },

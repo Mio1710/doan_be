@@ -54,6 +54,7 @@ export class TeacherController {
   @Get('student-topic/report')
   async getStudentTopicReport(@Res() res, @Req() req, @Query() query) {
     const studentId = query?.filter?.studentId;
+    console.log('studentId', studentId, query);
     const data = await this.reportTopicService.getLists({
       student_id: studentId,
     });
@@ -71,6 +72,7 @@ export class TeacherController {
     const data = await this.reportInternService.getLists({
       student_id: studentId,
     });
+    return this.responseUtils.success({ data }, res);
   }  
 
   @Put('student-topic/report/:id/comment')
