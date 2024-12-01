@@ -13,7 +13,8 @@ import {
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { ReportTopicService, ReportInternService, ResultService, UserService } from 'src/services';
+import { RecommendTopicService, ReportTopicService, ReportInternService, ResultService, UserService } from 'src/services';
+
 import { ResponseUtils } from 'src/utils/response.util';
 
 @Controller('teachers')
@@ -25,9 +26,16 @@ export class TeacherController {
     private readonly reportTopicService: ReportTopicService,
     private readonly reportInternService: ReportInternService,
     private readonly resultService: ResultService,
+    private readonly recommendTopicService: RecommendTopicService,
     private readonly responseUtils: ResponseUtils,
-  ) {
-    console.log('responseUtils', responseUtils);
+  ) {}
+
+  @Get()
+  async getListTeachers(@Res() res, @Req() req, @Query() query) {
+    const khoa_id = req.user.khoa_id;
+    const options = { query: { khoa_id, query } };
+    const data = await this.userService.getLists(options);
+    return this.responseUtils.success({ data }, res);
   }
 
   @Get('student-topic')
@@ -74,6 +82,15 @@ export class TeacherController {
     });
     return this.responseUtils.success({ data }, res);
   }  
+
+  @Get('student-topic/recommend-topics')
+  async getStudentRecommendTopic(@Res() res, @Req() req) {
+    const teacher_id = req.user.id;
+    console.log('teacher_id', teacher_id);
+
+    const data = await this.recommendTopicService.getListByTeacher(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
 
   @Put('student-topic/report/:id/comment')
   async updateStudentTopicReport(

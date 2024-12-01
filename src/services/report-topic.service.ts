@@ -66,8 +66,6 @@ export class ReportTopicService {
   }
 
   async commentReportTopic(id: number, comment: string): Promise<UpdateResult> {
-    console.log('commentcomment', comment);
-    
     return await this.reportTopicRepository
       .createQueryBuilder()
       .update()
