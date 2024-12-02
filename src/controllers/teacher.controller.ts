@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
+import { RecommendTopicStatusDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import {
@@ -69,6 +70,16 @@ export class TeacherController {
     console.log('teacher_id', teacher_id);
 
     const data = await this.recommendTopicService.getListByTeacher(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('student-topic/recommend-topics/:id')
+  async updateStudentRecommendTopic(
+    @Res() res,
+    @Body() body: RecommendTopicStatusDto,
+    @Param('id') id,
+  ) {
+    const data = await this.recommendTopicService.updateStatus(id, body.status);
     return this.responseUtils.success({ data }, res);
   }
 

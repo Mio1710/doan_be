@@ -114,6 +114,7 @@ export class AdminController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('super_admin')
   @Put('teachers/:id/reset-password')
   async resetPassword(@Param('id') id: number, @Res() res) {
     const { matkhau, ...data } = await this.userService.resetPassword(id);

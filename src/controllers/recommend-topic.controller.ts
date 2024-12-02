@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -44,12 +46,16 @@ export class RecommendTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
-  @Post(':id')
-  async updateRecommendTopic(@Req() req, @Res() res) {
-    const data = await this.recommendTopicService.update(
-      req.params.id,
-      req.body,
-    );
+  @Put(':id')
+  async updateRecommendTopic(
+    @Req() req,
+    @Res() res,
+    @Param('id') id: number,
+    @Body() body: CreateRecommendTopicDto,
+  ) {
+    console.log('body', body);
+    
+    const data = await this.recommendTopicService.update(id, body);
     return this.responseUtils.success({ data }, res);
   }
 
