@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty } from 'class-validator';
+import { IsEmpty, IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateTopicDto {
   @IsNotEmpty()
@@ -63,4 +63,10 @@ export class CreateRecommendTopicDto {
 
   @IsNotEmpty()
   description: string;
+}
+
+export class RecommendTopicStatusDto {
+  @IsNotEmpty()
+  @IsEnum(['approved', 'rejected'])
+  status: string;
 }

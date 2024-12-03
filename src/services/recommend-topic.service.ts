@@ -1,5 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateRecommendTopicDto } from 'src/dtos';
 import { RecommendTopic } from 'src/entities';
 import { Repository } from 'typeorm';
 
@@ -17,8 +18,12 @@ export class RecommendTopicService {
     return this.recommendTopicRepository.save(recommendTopic);
   }
 
-  async update(id: number, recommendTopic: RecommendTopic) {
+  async update(id: number, recommendTopic: CreateRecommendTopicDto) {
     return await this.recommendTopicRepository.update(id, recommendTopic);
+  }
+
+  async updateStatus(id: number, status: string) {
+    return await this.recommendTopicRepository.update(id, { status });
   }
 
   async delete(id: number): Promise<RecommendTopic[]> {
