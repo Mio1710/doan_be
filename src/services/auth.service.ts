@@ -27,7 +27,7 @@ export class AuthService {
       user = await this.usersService.findOne({ maso: maso });
       typeUser = user.roles;
     } else {
-      console.log('type student', type);
+      console.log('type student', type, maso, pass);
       user = await this.studentService.findOne({ maso: maso });
       console.log('user student', user, maso);
     }

@@ -21,6 +21,9 @@ export class RecommendTopic extends BaseEntity {
   @Column({ length: 1000, type: 'nvarchar', nullable: true })
   knowledge: string;
 
+  @Column({ length: 1000, type: 'nvarchar', nullable: true })
+  reject_reason: string;
+
   @Column({
     type: 'enum',
     enum: ['pending', 'approved', 'rejected'],

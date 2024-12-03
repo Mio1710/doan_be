@@ -1,8 +1,14 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class SingInDto {
+  @IsNotEmpty()
   maso: string;
+
+  @IsNotEmpty()
   matkhau: string;
+
+  @IsOptional()
+  @IsString()
   type?: string;
 }
 
