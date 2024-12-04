@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateTopicDto } from 'src/dtos';
@@ -98,6 +99,12 @@ export class TopicController {
 
     const data = await this.topicService.checkTopic(id, status);
     console.log('topic data', data);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Delete(':id')
+  async deleteTopic(@Param('id') id: number, @Res() res) {
+    const data = await this.topicService.delete(id);
     return this.responseUtils.success({ data }, res);
   }
 }
