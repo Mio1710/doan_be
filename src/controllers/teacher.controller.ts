@@ -99,7 +99,7 @@ export class TeacherController {
     @Body() body: RecommendTopicStatusDto,
     @Param('id') id,
   ) {
-    const data = await this.recommendTopicService.updateStatus(id, body.status);
+    const data = await this.recommendTopicService.updateStatus(id, body);
     return this.responseUtils.success({ data }, res);
   }
 

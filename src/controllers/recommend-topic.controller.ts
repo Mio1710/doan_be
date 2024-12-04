@@ -53,8 +53,6 @@ export class RecommendTopicController {
     @Param('id') id: number,
     @Body() body: CreateRecommendTopicDto,
   ) {
-    console.log('body', body);
-    
     const data = await this.recommendTopicService.update(id, body);
     return this.responseUtils.success({ data }, res);
   }

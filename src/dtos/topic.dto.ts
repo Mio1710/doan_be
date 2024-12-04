@@ -1,4 +1,4 @@
-import { IsEmpty, IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEmpty, IsEnum, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateTopicDto {
   @IsNotEmpty()
@@ -69,4 +69,9 @@ export class RecommendTopicStatusDto {
   @IsNotEmpty()
   @IsEnum(['approved', 'rejected'])
   status: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(0, 1000)
+  reject_reason?: string;
 }
