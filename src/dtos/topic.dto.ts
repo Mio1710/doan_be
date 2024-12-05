@@ -1,4 +1,11 @@
-import { IsEmpty, IsEnum, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsEmpty,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class CreateTopicDto {
   @IsNotEmpty()
@@ -74,4 +81,12 @@ export class RecommendTopicStatusDto {
   @IsString()
   @Length(0, 1000)
   reject_reason?: string;
+}
+
+export class CreateTopicBySubjectDto {
+  @IsNotEmpty()
+  ten: string;
+
+  @IsNotEmpty()
+  teacher_id: number;
 }

@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Semester, Topic, TopicSemester } from '../entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { ListTopicQuery } from 'src/interfaces/queries/listTopic.interface';
 import { SemesterService } from './semester.service';
@@ -91,9 +91,8 @@ export class TopicService {
     return await this.topicRepository.update(id, topic);
   }
 
-  async delete(id: number): Promise<Topic[]> {
-    const topic = await this.topicRepository.find({ where: { id } });
-    return await this.topicRepository.remove(topic);
+  async delete(id: number): Promise<UpdateResult> {
+    return await this.topicRepository.softDelete(id);
   }
 
   async findOne(options): Promise<Topic> {
