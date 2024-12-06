@@ -12,6 +12,7 @@ export default new DataSource({
   database: process.env.DB_NAME,
   entities: ['dist/**/*.entity{.ts,.js}'],
   synchronize: true,
+  // synchronize: process.env.NODE_ENV === 'local',
   logging: true,
   migrations: ['./db/migrations/*s{.ts,.js}'],
   migrationsTableName: 'migrations',

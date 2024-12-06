@@ -6,7 +6,7 @@ import { getStatusCodeMessage } from 'src/constants/http.constants';
 export class ResponseUtils {
   failed(response: ResponseInterface, @Res() res: Response) {
     const status_code = response.status_code ?? HttpStatusCode.BadRequest;
-    console.log('response trong utils', response);
+    // console.log('response trong utils', response);
 
     const result = {
       status_code,
@@ -25,7 +25,7 @@ export class ResponseUtils {
       meta: response.meta,
     };
     // lập tức trả về response, kết thúc request, không thể tiếp tục interceptor(s)
-    console.log('end response utils', result.data);
+    // console.log('end response utils', result.data);
     return res.status(status_code).json(result);
   }
 }
