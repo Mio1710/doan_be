@@ -329,14 +329,14 @@ export class StudentTopicService {
           'student_topics.semester_id',
           'student_topics.group_id',
           'topic',
-          'user.ten',
-          'user.hodem',
+          'teacher.ten',
+          'teacher.hodem',
           'group.id',
           'group.first_partner_id',
           'group.second_partner_id',
         ])
         .leftJoin('student_topics.topic', 'topic')
-        .leftJoin('topic.createdBy', 'user')
+        .leftJoin('topic.teacher', 'teacher')
         .leftJoin('student_topics.group', 'group')
         .where('student_topics.student_id = :student_id', {
           student_id: userId,
