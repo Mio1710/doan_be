@@ -60,4 +60,7 @@ export class Topic extends BaseEntity {
   // add soft delete
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
   deletedAt: Date;
+
+  @Column({ type: 'int', default: 4 })
+  numberStudent: number;
 }

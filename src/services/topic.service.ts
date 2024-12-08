@@ -46,6 +46,7 @@ export class TopicService {
         'topic.knowledge',
         'topic.status',
         'topic.id',
+        'topic.numberStudent',
         'user.ten',
         'user.hodem',
         'user.id',

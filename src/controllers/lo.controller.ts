@@ -34,7 +34,6 @@ export class LOController {
   async createLO(@Body() lo: CreateLODto, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
     const data = await this.loService.create({ ...lo, khoa_id });
-    console.log('lo data create', data);
     return this.responseUtils.success({ data }, res);
   }
 
@@ -43,16 +42,14 @@ export class LOController {
     console.log('lo id', id);
 
     const data = await this.loService.findOne({ id });
-    console.log('lo data', data);
     return this.responseUtils.success({ data }, res);
   }
 
   @Put(':id')
-  async updateLO(@Param() id: number, @Body() lo: Partial<LO>, @Res() res) {
+  async updateLO(@Param('id') id: number, @Body() lo: Partial<LO>, @Res() res) {
     console.log('lo id', id);
 
     const data = await this.loService.update(id, lo as LO);
-    console.log('lo data', data);
     return this.responseUtils.success({ data }, res);
   }
 }
