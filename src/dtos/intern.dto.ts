@@ -22,9 +22,6 @@ export class CreateInternDto {
   @IsNotEmpty()
   supervisor_email: string;
 
-  @IsNotEmpty()
-  teacher_id: number;
-
 }
 
 export class UpdateInternDto {
