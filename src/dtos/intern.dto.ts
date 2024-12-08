@@ -3,6 +3,28 @@ import { IsNotEmpty, IsEmpty } from 'class-validator';
 export class CreateInternDto {
   @IsNotEmpty()
   company_name: string;
+
+  @IsNotEmpty()
+  address: string;
+
+  @IsNotEmpty()
+  company_phone: string;
+
+  @IsNotEmpty()
+  company_email: string;
+
+  @IsNotEmpty()
+  supervisor_name: string;
+
+  @IsNotEmpty()
+  supervisor_phone: string;
+
+  @IsNotEmpty()
+  supervisor_email: string;
+
+  @IsNotEmpty()
+  teacher_id: number;
+
 }
 
 export class UpdateInternDto {
