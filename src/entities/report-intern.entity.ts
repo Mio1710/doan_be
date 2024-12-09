@@ -19,7 +19,10 @@ export class ReportIntern extends BaseEntity {
   @Column({ type: 'nvarchar', length: 1000 })
   description: string;
 
-  @ManyToOne(() => StudentIntern, (studentIntern) => studentIntern.reportInterns)
+  @ManyToOne(
+    () => StudentIntern,
+    (studentIntern) => studentIntern.reportInterns,
+  )
   @JoinColumn({ name: 'student_intern_id' })
   studentIntern: StudentIntern;
 
