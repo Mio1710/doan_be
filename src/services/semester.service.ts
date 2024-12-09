@@ -1,16 +1,22 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { Semester } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SemesterService {
   constructor(
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async getLists(options): Promise<Semester[]> {
+    console.log('options', options);
+
     return await this.semesterRepository
       .createQueryBuilder('semester')
       .leftJoinAndSelect('semester.createdBy', 'user')
@@ -71,13 +77,27 @@ export class SemesterService {
   }
 
   async getActiveSemester(): Promise<Semester> {
-    const semester = await this.semesterRepository.findOne({
-      where: { status: true },
-      select: ['id', 'ten', 'status'],
-    });
+    const activeSemesterCache = await this.cacheManager.get('activeSemester');
+    if (!activeSemesterCache) {
+      const semester = await this.semesterRepository.findOne({
+        where: { status: true },
+        select: ['id', 'ten', 'status'],
+      });
+      await this.cacheManager.set('activeSemester', semester);
+      return semester;
+    }
+    return activeSemesterCache as Semester;
+  }
+
+  async allowRegisterGroup(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
     if (!semester) {
       throw new HttpException('Semester not found', 404);
     }
-    return semester;
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_date);
+    const endDate = new Date(semester.end_date);
+
+    return currentDate >= startDate && currentDate <= endDate;
   }
 }

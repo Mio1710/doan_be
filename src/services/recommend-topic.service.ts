@@ -43,6 +43,7 @@ export class RecommendTopicService {
       const recommendTopic = await this.recommendTopicRepository.findOne({
         where: { ...options },
       });
+      console.log('recommendTopic', recommendTopic);
 
       return recommendTopic;
     } catch (error) {
