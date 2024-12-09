@@ -15,6 +15,8 @@ export class SemesterService {
   ) {}
 
   async getLists(options): Promise<Semester[]> {
+    console.log('options', options);
+
     return await this.semesterRepository
       .createQueryBuilder('semester')
       .leftJoinAndSelect('semester.createdBy', 'user')
@@ -81,12 +83,21 @@ export class SemesterService {
         where: { status: true },
         select: ['id', 'ten', 'status'],
       });
-      if (!semester) {
-        throw new HttpException('Semester not found', 404);
-      }
       await this.cacheManager.set('activeSemester', semester);
       return semester;
     }
     return activeSemesterCache as Semester;
+  }
+
+  async allowRegisterGroup(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_date);
+    const endDate = new Date(semester.end_date);
+
+    return currentDate >= startDate && currentDate <= endDate;
   }
 }
