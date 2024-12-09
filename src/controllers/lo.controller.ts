@@ -9,6 +9,7 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
+import { Roles } from 'src/decorators/role.decorator';
 import { CreateLODto } from 'src/dtos';
 import { LO } from 'src/entities';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -30,6 +31,7 @@ export class LOController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('supper_admin')
   @Post()
   async createLO(@Body() lo: CreateLODto, @Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;

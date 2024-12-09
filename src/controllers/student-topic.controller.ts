@@ -13,6 +13,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
 import { CreateStudentDto, UpdateStudentTopicDto } from 'src/dtos';
+import { AllowRegisterGroupGuard } from 'src/guards/allow-register-group.guard';
 import { AllowStudentRegisterTopicGuard } from 'src/guards/allow-student-register-topic.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -79,6 +80,7 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @UseGuards(AllowStudentRegisterTopicGuard)
   @Post('topic')
   async updateTopic(
     @Res() res,
@@ -100,6 +102,7 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @UseGuards(AllowRegisterGroupGuard)
   @Post('/create-group')
   async createGroup(
     @Res() res,
