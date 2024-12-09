@@ -20,6 +20,7 @@ import { RequestInterceptor } from './interceptors/request.interceptor';
 import * as ListUtils from './utils';
 import { BaseSubscriber } from './subscribers/base.subscribe';
 import { config } from 'dotenv';
+import { CacheModule } from '@nestjs/cache-manager';
 config();
 console.log('env', process.env.DB_NAME);
 
@@ -50,6 +51,9 @@ console.log('env', process.env.DB_NAME);
       middleware: {
         mount: true,
       },
+    }),
+    CacheModule.register({
+      ttl: 360000,
     }),
   ],
   controllers: [AppController, ...Object.values(ListControllers)],

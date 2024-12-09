@@ -1,13 +1,17 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { Semester } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SemesterService {
   constructor(
     @InjectRepository(Semester)
     private readonly semesterRepository: Repository<Semester>,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async getLists(options): Promise<Semester[]> {
@@ -71,13 +75,18 @@ export class SemesterService {
   }
 
   async getActiveSemester(): Promise<Semester> {
-    const semester = await this.semesterRepository.findOne({
-      where: { status: true },
-      select: ['id', 'ten', 'status'],
-    });
-    if (!semester) {
-      throw new HttpException('Semester not found', 404);
+    const activeSemesterCache = await this.cacheManager.get('activeSemester');
+    if (!activeSemesterCache) {
+      const semester = await this.semesterRepository.findOne({
+        where: { status: true },
+        select: ['id', 'ten', 'status'],
+      });
+      if (!semester) {
+        throw new HttpException('Semester not found', 404);
+      }
+      await this.cacheManager.set('activeSemester', semester);
+      return semester;
     }
-    return semester;
+    return activeSemesterCache as Semester;
   }
 }
