@@ -10,10 +10,7 @@ import { UpdateResult } from 'typeorm';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { format, parse } from 'date-fns';
-
-// manage teacher/admin
-// need exclude password field
+import { parse } from 'date-fns';
 
 @Injectable()
 export class UserService {
@@ -179,7 +176,6 @@ export class UserService {
 
           // Check if user already exists
           const isExist = await this.checkExistUser(userInstance.maso);
-          console.log('user isExist', userInstance.ngay_sinh, isExist);
           if (isExist) {
             errors.push({
               ...rawUser,
@@ -198,10 +194,11 @@ export class UserService {
           userInstance.matkhau = await bcrypt.hash('12345678', 10);
 
           userInstance.khoa_id = khoa_id;
-          userInstance.ngay_sinh = new Date(
-            format(userInstance.ngay_sinh, 'dd/MM/yyyy'),
+          userInstance.ngay_sinh = parse(
+            userInstance.ngay_sinh as unknown as string,
+            'dd/MM/yyyy',
+            new Date(),
           );
-          console.log('userInstance', userInstance);
 
           validUsers.push(userInstance);
         } catch (error) {
