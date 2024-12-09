@@ -47,7 +47,7 @@ export class StudentInternController {
 
     const data = await this.studentInternService.import(students, khoa_id);
     if (data.status === 'success') {
-      return this.responseUtils.success({ data }, res);
+      return this.responseUtils.success({ data: null }, res);
     } else {
       this.studentInternService.sendExcelFile(res, data, 'error_student.xlsx');
     }

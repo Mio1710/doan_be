@@ -11,7 +11,10 @@ import {
   Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from 'src/decorators/role.decorator';
 import { CreateStudentDto, UpdateStudentTopicDto } from 'src/dtos';
+import { AllowRegisterGroupGuard } from 'src/guards/allow-register-group.guard';
+import { AllowStudentRegisterTopicGuard } from 'src/guards/allow-student-register-topic.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { StudentTopicService } from 'src/services';
@@ -32,6 +35,8 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('admin')
+  @Roles('super_teacher')
   @Post()
   async createUser(@Body() student: CreateStudentDto, @Res() res) {
     const { matkhau, ...data } = await this.studentTopicService.create(student);
@@ -39,6 +44,7 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('admin')
   @Post('import')
   @UseInterceptors(FileInterceptor('file'))
   async importTeacher(@UploadedFile() students, @Res() res, @Req() req) {
@@ -65,6 +71,7 @@ export class StudentTopicController {
     }
   }
 
+  @UseGuards(AllowStudentRegisterTopicGuard)
   @Post('register')
   async getTopicRegistedDetailById(@Res() res, @Req() req, @Body() topic) {
     const userId = req.user.id;
@@ -73,6 +80,7 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @UseGuards(AllowStudentRegisterTopicGuard)
   @Post('topic')
   async updateTopic(
     @Res() res,
@@ -94,6 +102,7 @@ export class StudentTopicController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @UseGuards(AllowRegisterGroupGuard)
   @Post('/create-group')
   async createGroup(
     @Res() res,

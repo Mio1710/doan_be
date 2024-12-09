@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClsService } from 'nestjs-cls';
 import { SemesterService } from './semester.service';
-import { format } from 'date-fns';
+import { parse } from 'date-fns';
 import { ImportStudentDto } from 'src/dtos';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -250,7 +250,6 @@ export class StudentTopicService {
 
           // Check if sv already exists in semester topic
           const isExist = await this.checkExistStudent(userInstance.maso);
-          console.log('user isExist', userInstance.ngay_sinh, isExist);
           if (isExist) {
             const studentTopic = await this.checkExistStudentTopic(
               isExist.id,
@@ -271,8 +270,10 @@ export class StudentTopicService {
           userInstance.matkhau = await bcrypt.hash('12345678', 10);
 
           userInstance.khoa_id = khoa_id;
-          userInstance.ngay_sinh = new Date(
-            format(userInstance.ngay_sinh, 'dd/MM/yyyy'),
+          userInstance.ngay_sinh = parse(
+            userInstance.ngay_sinh as unknown as string,
+            'dd/MM/yyyy',
+            new Date(),
           );
           console.log('userInstance', userInstance);
 

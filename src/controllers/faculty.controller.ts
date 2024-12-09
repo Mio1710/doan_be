@@ -43,12 +43,14 @@ export class FacultyController {
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('super_admin')
   @Put(':id')
   async updateFaculty(@Body() faculty: FacultyDto, @Res() res) {
     const data = await this.facultyService.update(faculty);
     return this.responseUtils.success({ data }, res);
   }
 
+  @Roles('super_admin')
   @Delete(':id')
   async deleteFaculty(@Param('id') id: number, @Res() res) {
     const data = await this.facultyService.delete(id);

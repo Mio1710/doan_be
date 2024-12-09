@@ -21,6 +21,7 @@ export class SemesterService {
       .createQueryBuilder('semester')
       .leftJoinAndSelect('semester.createdBy', 'user')
       .select(['semester', 'user.ten', 'user.hodem', 'user.id'])
+      .orderBy('semester.created_at', 'DESC')
       .getMany();
   }
 
@@ -29,7 +30,9 @@ export class SemesterService {
   }
 
   async update(id: number, semester: Semester) {
-    return await this.semesterRepository.update(id, semester);
+    const resutl = await this.semesterRepository.update(id, semester);
+    await this.cacheManager.set('activeSemester', semester);
+    return resutl;
   }
 
   async delete(id: number): Promise<Semester[]> {
@@ -81,7 +84,23 @@ export class SemesterService {
     if (!activeSemesterCache) {
       const semester = await this.semesterRepository.findOne({
         where: { status: true },
-        select: ['id', 'ten', 'status'],
+        select: [
+          'id',
+          'ten',
+          'status',
+          'start_date',
+          'end_date',
+          'start_register_topic',
+          'end_register_topic',
+          'start_publish_topic',
+          'end_publish_topic',
+          'start_register_group',
+          'end_register_group',
+          'start_defense',
+          'end_defense',
+          'start_report_topic',
+          'end_report_topic',
+        ],
       });
       await this.cacheManager.set('activeSemester', semester);
       return semester;
@@ -97,6 +116,48 @@ export class SemesterService {
     const currentDate = new Date();
     const startDate = new Date(semester.start_date);
     const endDate = new Date(semester.end_date);
+
+    console.log('allowRegisterGroup', currentDate, startDate, endDate);
+
+    return currentDate >= startDate && currentDate <= endDate;
+  }
+
+  async allowRegisterTopic(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_register_topic);
+    const endDate = new Date(semester.end_register_topic);
+
+    console.log('allowRegisterTopic', currentDate, startDate, endDate);
+
+    return currentDate >= startDate && currentDate <= endDate;
+  }
+
+  async allowPublishTopic(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    // if (!semester.start_publish_topic || !semester.end_publish_topic) {
+    //   return false;
+    // }
+
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_publish_topic);
+    const endDate = new Date(semester.end_publish_topic);
+
+    console.log(
+      'allowPublishTopic',
+      semester,
+      currentDate,
+      startDate,
+      endDate,
+      semester.start_publish_topic,
+      semester.end_publish_topic,
+    );
 
     return currentDate >= startDate && currentDate <= endDate;
   }

@@ -23,5 +23,9 @@ jobs:
         cache: 'npm'
     - name: Install dependencies
       run: npm install
+
+    - name: Build
+      run: npm run build
+      
     - name: Run
       run: pm2 restart Doan_BE --update-env

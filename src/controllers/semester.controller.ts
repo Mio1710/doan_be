@@ -61,6 +61,7 @@ export class SemesterController {
     console.log('semester id', id);
 
     const data = await this.semesterService.update(id, semester as Semester);
+    await this.semesterService.getActiveSemester();
     console.log('semester data', data);
     return this.responseUtils.success({ data }, res);
   }
