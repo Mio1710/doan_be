@@ -21,6 +21,7 @@ export class SemesterService {
       .createQueryBuilder('semester')
       .leftJoinAndSelect('semester.createdBy', 'user')
       .select(['semester', 'user.ten', 'user.hodem', 'user.id'])
+      .orderBy('semester.created_at', 'DESC')
       .getMany();
   }
 
@@ -97,6 +98,36 @@ export class SemesterService {
     const currentDate = new Date();
     const startDate = new Date(semester.start_date);
     const endDate = new Date(semester.end_date);
+
+    console.log('allowRegisterGroup', currentDate, startDate, endDate);
+
+    return currentDate >= startDate && currentDate <= endDate;
+  }
+
+  async allowRegisterTopic(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_register_topic);
+    const endDate = new Date(semester.end_register_topic);
+
+    console.log('allowRegisterTopic', currentDate, startDate, endDate);
+
+    return currentDate >= startDate && currentDate <= endDate;
+  }
+
+  async allowPublishTopic(): Promise<boolean> {
+    const semester = await this.getActiveSemester();
+    if (!semester) {
+      throw new HttpException('Semester not found', 404);
+    }
+    const currentDate = new Date();
+    const startDate = new Date(semester.start_publish_topic);
+    const endDate = new Date(semester.end_publish_topic);
+
+    console.log('allowPublishTopic', currentDate, startDate, endDate);
 
     return currentDate >= startDate && currentDate <= endDate;
   }

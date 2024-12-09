@@ -12,8 +12,6 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  // UsePipes,
-  // ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
@@ -26,7 +24,12 @@ import {
 } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { StudentService, StudentTopicService, StudentInternService, UserService } from 'src/services';
+import {
+  StudentService,
+  StudentTopicService,
+  StudentInternService,
+  UserService,
+} from 'src/services';
 import { ResponseUtils } from 'src/utils/response.util';
 
 @Controller('admin')
@@ -38,7 +41,7 @@ export class AdminController {
     private readonly responseUtils: ResponseUtils,
     private readonly studentService: StudentService,
     private readonly studentTopicService: StudentTopicService,
-    private readonly studentInternService: StudentInternService, 
+    private readonly studentInternService: StudentInternService,
   ) {
     console.log('responseUtils', responseUtils);
   }
