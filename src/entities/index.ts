@@ -7,6 +7,8 @@ export * from './topic.entity';
 export * from './studentSubject.entity';
 export * from './student-topic.entity';
 export * from './student-intern.entity';
+export * from './intern.entity';
+export *  from './intern-semester.entity';
 export * from './topic-semester.entity';
 export * from './group.entity';
 export * from './lo.entity';
@@ -14,4 +16,6 @@ export * from './lo-student-topic.entity';
 export * from './teacher_group.entity';
 export * from './teacher_group_member.entity';
 export * from './report-topic.entity';
+export * from './report-intern.entity';
 export * from './recommend-topic.entity';
+

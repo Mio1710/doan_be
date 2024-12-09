@@ -21,11 +21,12 @@ import {
   CreateStudentDto,
   CreateUserDTO,
   StudentInfoDto,
+  StudentInternInfoDto,
   UpdateTeacherDto,
 } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { StudentService, StudentTopicService, UserService } from 'src/services';
+import { StudentService, StudentTopicService, StudentInternService, UserService } from 'src/services';
 import { ResponseUtils } from 'src/utils/response.util';
 
 @Controller('admin')
@@ -37,6 +38,7 @@ export class AdminController {
     private readonly responseUtils: ResponseUtils,
     private readonly studentService: StudentService,
     private readonly studentTopicService: StudentTopicService,
+    private readonly studentInternService: StudentInternService, 
   ) {
     console.log('responseUtils', responseUtils);
   }
@@ -95,6 +97,56 @@ export class AdminController {
     @Res() res,
   ) {
     const data = await this.studentTopicService.delete(student_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  // Student intern
+  @Get('teachers/student-intern')
+  async getStudentIntern(@Res() res, @Req() req) {
+    const teacher_id = req.user.id;
+    const data = await this.userService.getStudentIntern(teacher_id);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Post('student-intern')
+  async createStudentIntern(
+    @Res() res,
+    @Req() req,
+    @Body() body: CreateStudentDto,
+  ) {
+    const khoa_id = req.user.khoa_id;
+    body.khoa_id = khoa_id;
+    const data = await this.studentInternService.create(body);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('student-intern/:id')
+  async updateStudentIntern(
+    @Param('id') id: number,
+    @Res() res,
+    @Body() body: CreateStudentDto,
+  ) {
+    const data = await this.studentInternService.update(id, body);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Put('student-intern/:id/info')
+  async updateStudentInternInfo(
+    @Param('id') id: number,
+    @Res() res,
+    @Body() body: StudentInternInfoDto,
+  ) {
+    delete body.studentIntern;
+    const data = await this.studentService.updateInfo(body);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @Delete('student-intern/:student_id')
+  async deleteStudentIntern(
+    @Param('student_id') student_id: number,
+    @Res() res,
+  ) {
+    const data = await this.studentInternService.delete(student_id);
     return this.responseUtils.success({ data }, res);
   }
 

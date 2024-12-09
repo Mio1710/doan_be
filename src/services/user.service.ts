@@ -52,6 +52,10 @@ export class UserService {
     return findQuery.getMany();
   }
 
+  getListss(options): Promise<User[]> {
+    return this.userRepository.findAll(options);
+  }
+
   async create(user: CreateUserDTO): Promise<User> {
     const isExist = await this.checkExistUser(user.maso);
     console.log('user before isExist', user.maso, isExist);
@@ -288,6 +292,46 @@ export class UserService {
         relations: {
           studentTopic: {
             topic: true,
+          },
+        },
+      };
+      return await this.studentService.getLists(options);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+
+  // Get student intern
+  async getStudentIntern(teacher_id: number): Promise<Student[]> {
+    try {
+      const activeSemester = await this.semesterService.getActiveSemester();
+      const options = {
+        select: {
+          id: true,
+          maso: true,
+          hodem: true,
+          ten: true,
+          email: true,
+          lop: true,
+          phone: true,
+          studentIntern: {
+            id: true,
+            intern: {
+              company_name: true,
+            },
+          },
+        },
+        where: {
+          studentIntern: {
+            semester_id: activeSemester.id,
+            intern: {
+              teacher: { id: teacher_id },
+            },
+          },
+        },
+        relations: {
+          studentIntern: {
+            intern: true,
           },
         },
       };

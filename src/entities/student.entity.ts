@@ -1,9 +1,10 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { Faculty } from './faculty.entity';
 import { BaseEntity } from './base.entity';
 import { StudentTopic } from './student-topic.entity';
 import { StudentIntern } from './student-intern.entity';
 import { Group } from './group.entity';
+// import { Intern } from './intern.entity';
 
 @Entity('student')
 export class Student extends BaseEntity {
@@ -43,9 +44,14 @@ export class Student extends BaseEntity {
   })
   studentTopic: StudentTopic[];
 
-  @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student)
+  @OneToMany(() => StudentIntern, (studentIntern) => studentIntern.student, {
+    onUpdate: 'NO ACTION',
+  })
   studentIntern: StudentIntern[];
 
   @ManyToOne(() => Group)
   group: Group;
+
+  // @OneToOne(() => Intern)
+  // intern: Intern;
 }

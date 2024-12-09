@@ -20,6 +20,7 @@ export class CreateStudentDto {
   @IsOptional()
   @Length(6, 20)
   matkhau: string = '12345678';
+
   // matkhau: string;
 
   @IsNotEmpty()
@@ -47,7 +48,7 @@ export class UpdateStudentDto {
 
   @IsOptional()
   @Length(6, 20)
-  matkhau: string = '123456';
+  matkhau: string = '12345678';
   // matkhau: string;
 
   @IsOptional()
@@ -60,6 +61,14 @@ export class UpdateStudentTopicDto {
 
   @IsOptional()
   topic_id?: number;
+}
+
+export class UpdateStudentInternDto {
+  @IsOptional()
+  student_intern_id?: number;
+
+  @IsOptional()
+  intern_id?: number;
 }
 
 export class StudentInfoDto {
@@ -87,6 +96,33 @@ export class StudentInfoDto {
   lop: string;
 
   studentTopic: [];
+}
+
+export class StudentInternInfoDto {
+  @IsNotEmpty()
+  maso: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  hodem: string;
+
+  @IsNotEmpty()
+  @Length(1, 500)
+  ten: string;
+
+  @IsNotEmpty()
+  @Length(1, 50)
+  email: string;
+
+  @IsOptional()
+  @Length(1, 11)
+  phone: string;
+
+  @IsNotEmpty()
+  @Length(1, 15)
+  lop: string;
+
+  studentIntern: [];
 }
 
 export class ImportStudentDto {

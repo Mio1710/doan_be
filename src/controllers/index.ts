@@ -12,6 +12,11 @@ export * from './lo.controller';
 export * from './result.controller';
 export * from './admin.controller';
 export * from './teacher-group.controller';
+export * from './intern.controller';
+export * from './teacher-intern.controller';
+export * from './student-teacher.controller'
 export * from './report-topic.controller';
+export * from './report-intern.controller';
 export * from './public.controller';
 export * from './recommend-topic.controller';
+
