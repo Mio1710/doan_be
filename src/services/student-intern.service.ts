@@ -239,18 +239,12 @@ export class StudentInternService {
           userInstance.matkhau = await bcrypt.hash('12345678', 10);
 
           userInstance.khoa_id = khoa_id;
-          console.log(
-            'check time',
-            userInstance.ngay_sinh,
-            parse('17/10/2002', 'dd/MM/yyyy', new Date()),
-          );
 
           userInstance.ngay_sinh = parse(
             userInstance.ngay_sinh as unknown as string,
             'dd/MM/yyyy',
             new Date(),
           );
-          console.log('userInstance', userInstance);
 
           validUsers.push(userInstance);
         } catch (error) {

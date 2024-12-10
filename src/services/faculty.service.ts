@@ -28,8 +28,12 @@ export class FacultyService {
     return await this.facultyRepository.save(faculty);
   }
 
-  async update(faculty: FacultyDto): Promise<Faculty> {
-    return await this.facultyRepository.save(faculty);
+  async update(id: number, faculty: FacultyDto): Promise<UpdateResult> {
+    try {
+      return await this.facultyRepository.update(id, faculty);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async delete(id: number): Promise<UpdateResult> {

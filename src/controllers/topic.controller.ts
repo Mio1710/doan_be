@@ -80,7 +80,7 @@ export class TopicController {
   @Put(':id')
   async updateTopic(
     @Param() id: number,
-    @Body() topic: Partial<Topic>,
+    @Body() topic: CreateTopicDto,
     @Res() res,
   ) {
     const data = await this.topicService.update(id, topic as Topic);

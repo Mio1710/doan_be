@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { LO } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class LOService {
@@ -15,18 +15,30 @@ export class LOService {
   }
 
   async create(LO): Promise<LO> {
-    await this.checkCof(LO.cof);
-    return this.LORepository.save(LO);
+    try {
+      await this.checkCof(LO.cof);
+      return await this.LORepository.save(LO);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async update(id: number, LO: LO) {
-    await this.checkCof(LO.cof, id);
-    return await this.LORepository.update(id, LO);
+    try {
+      await this.checkCof(LO.cof, id);
+      return await this.LORepository.update(id, LO);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
-  async delete(id: number): Promise<LO[]> {
-    const LO = await this.LORepository.find({ where: { id } });
-    return await this.LORepository.remove(LO);
+  async delete(id: number): Promise<DeleteResult> {
+    try {
+      const LO = await this.LORepository.findOne({ where: { id } });
+      return await this.LORepository.softDelete(LO.id);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async findOne(options): Promise<LO> {

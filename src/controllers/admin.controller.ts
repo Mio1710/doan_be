@@ -90,7 +90,7 @@ export class AdminController {
     @Body() body: StudentInfoDto,
   ) {
     delete body.studentTopic;
-    const data = await this.studentService.updateInfo(body);
+    const data = await this.studentService.updateInfo(id, body);
     return this.responseUtils.success({ data }, res);
   }
 
@@ -140,7 +140,7 @@ export class AdminController {
     @Body() body: StudentInternInfoDto,
   ) {
     delete body.studentIntern;
-    const data = await this.studentService.updateInfo(body);
+    const data = await this.studentService.updateInfo(id, body);
     return this.responseUtils.success({ data }, res);
   }
 

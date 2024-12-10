@@ -40,15 +40,17 @@ export class StudentService {
     return this.studentepository.save(student);
   }
 
-  async updateInfo(body): Promise<UpdateResult> {
+  async updateInfo(id: number, body): Promise<UpdateResult> {
     // check if the student exists
+    console.log('body info update', body);
+
     const student = await this.studentepository.findOne({
-      where: { maso: body.maso, id: Not(body.id) },
+      where: { maso: body.maso, id: Not(id) },
     });
     if (student) {
       throw new HttpException('Mã số sinh viên đã tồn tại', 400);
     }
-    return await this.studentepository.update(body.id, {
+    return await this.studentepository.update(id, {
       ten: body.ten,
       hodem: body.hodem,
       lop: body.lop,

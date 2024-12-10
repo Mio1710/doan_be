@@ -45,8 +45,12 @@ export class FacultyController {
 
   @Roles('super_admin')
   @Put(':id')
-  async updateFaculty(@Body() faculty: FacultyDto, @Res() res) {
-    const data = await this.facultyService.update(faculty);
+  async updateFaculty(
+    @Body() faculty: FacultyDto,
+    @Res() res,
+    @Param('id') id: number,
+  ) {
+    const data = await this.facultyService.update(id, faculty);
     return this.responseUtils.success({ data }, res);
   }
 

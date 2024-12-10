@@ -89,7 +89,11 @@ export class TopicService {
   }
 
   async update(id: number, topic: Topic) {
-    return await this.topicRepository.update(id, topic);
+    try {
+      return await this.topicRepository.update(id, topic);
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async delete(id: number): Promise<UpdateResult> {

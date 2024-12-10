@@ -9,7 +9,23 @@ import {
 
 export class CreateTopicDto {
   @IsNotEmpty()
+  @Length(0, 1000)
   ten: string;
+
+  @IsOptional()
+  @Length(0, 1000)
+  description: string;
+
+  @IsOptional()
+  @Length(0, 1000)
+  knowledge: string;
+
+  @IsOptional()
+  @Length(0, 1000)
+  requirement: string;
+
+  @IsOptional()
+  teacher_id: number;
 }
 
 export class UpdateTopicDto {

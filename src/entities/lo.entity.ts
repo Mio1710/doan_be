@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne, DeleteDateColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Faculty } from './faculty.entity';
 import { LOStudentTopic } from './lo-student-topic.entity';
@@ -8,7 +8,7 @@ export class LO extends BaseEntity {
   @Column({ length: 1000, type: 'nvarchar' })
   main_criteria: string;
 
-  @Column({ length: 1000, type: 'nvarchar' })
+  @Column({ length: 1000, type: 'nvarchar', nullable: true })
   sub_criteria: string;
 
   @Column({ type: 'float' })
@@ -26,4 +26,7 @@ export class LO extends BaseEntity {
 
   @OneToOne(() => LOStudentTopic, (loStudentTopic) => loStudentTopic.lo)
   loStudentTopic: LOStudentTopic;
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at', nullable: true })
+  deleted_at: Date;
 }
