@@ -99,7 +99,7 @@ export class AuthService {
       } else {
         const user = await this.usersService.findOne({ id: userId });
         user.phone = data.phone;
-        return this.usersService.update(user);
+        return this.usersService.update(userId, user);
       }
     } catch (error) {
       throw new HttpException(error.message, error.code ?? 400);

@@ -14,7 +14,13 @@ import { Roles } from 'src/decorators/role.decorator';
 import { RecommendTopicStatusDto } from 'src/dtos';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { RecommendTopicService, ReportTopicService, ReportInternService, ResultService, UserService } from 'src/services';
+import {
+  RecommendTopicService,
+  ReportTopicService,
+  ReportInternService,
+  ResultService,
+  UserService,
+} from 'src/services';
 
 import { ResponseUtils } from 'src/utils/response.util';
 
@@ -74,7 +80,7 @@ export class TeacherController {
   async getStudentInternReport(@Res() res, @Req() req, @Query() query) {
     const studentId = query?.filter?.studentId;
     console.log('studentId', studentId, query);
-    
+
     if (!studentId) {
       throw new HttpException('Student id is required', 400);
     }
@@ -82,7 +88,7 @@ export class TeacherController {
       student_id: studentId,
     });
     return this.responseUtils.success({ data }, res);
-  }  
+  }
 
   @Get('student-topic/recommend-topics')
   async getStudentRecommendTopic(@Res() res, @Req() req) {

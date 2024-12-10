@@ -162,20 +162,21 @@ export class AdminController {
   }
 
   @Put('teachers/:id')
-  async updateTeacher(@Body() user: UpdateTeacherDto, @Res() res) {
-    const { matkhau, ...data } = await this.userService.update(user);
-    console.log('matkhau', matkhau);
-
-    return this.responseUtils.success({ data }, res);
+  async updateTeacher(
+    @Body() user: UpdateTeacherDto,
+    @Res() res,
+    @Param('id') id: number,
+  ) {
+    await this.userService.update(id, user);
+    return this.responseUtils.success({ data: 'Success' }, res);
   }
 
   @Roles('super_admin')
   @Put('teachers/:id/reset-password')
   async resetPassword(@Param('id') id: number, @Res() res) {
-    const { matkhau, ...data } = await this.userService.resetPassword(id);
-    console.log('matkhau', matkhau);
+    await this.userService.resetPassword(id);
 
-    return this.responseUtils.success({ data }, res);
+    return this.responseUtils.success({ data: 'Success' }, res);
   }
 
   @Get('teachers/:id')

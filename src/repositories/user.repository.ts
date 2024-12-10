@@ -36,8 +36,8 @@ export class UserRepository {
     return await this.userRepository.save(user);
   }
 
-  async update(user: UpdateTeacherDto): Promise<User> {
-    return await this.userRepository.save(user);
+  async update(id: number, user: UpdateTeacherDto): Promise<UpdateResult> {
+    return await this.userRepository.update(user.id, user);
   }
 
   async delete(user: User): Promise<UpdateResult> {

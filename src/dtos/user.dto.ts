@@ -44,6 +44,9 @@ export class CreateUserDTO {
 
 export class UpdateTeacherDto {
   @IsNotEmpty()
+  id: number;
+
+  @IsNotEmpty()
   maso: string;
 
   @IsNotEmpty()

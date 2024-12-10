@@ -46,7 +46,7 @@ export class UserService {
         { query: `%${query.filter.q}%` },
       );
     }
-    return findQuery.getMany();
+    return findQuery.orderBy('created_at', 'DESC').getMany();
   }
 
   getListss(options): Promise<User[]> {
@@ -77,17 +77,20 @@ export class UserService {
     return this.userRepository.create(user);
   }
 
-  async update(user: UpdateTeacherDto): Promise<User> {
+  async update(id: number, user: UpdateTeacherDto): Promise<UpdateResult> {
     try {
+      const existMaso = await this.checkExistMasoUpdate(user.maso, id);
+      if (existMaso) {
+        throw new HttpException('Mã số đã tồn tại', 400);
+      }
       if (user.ngay_sinh) {
-        console.log('user.ngay_sinh start', user.ngay_sinh);
         user.ngay_sinh = parse(
           user.ngay_sinh.toString(),
           'dd/MM/yyyy',
           new Date(),
         );
       }
-      return await this.userRepository.update(user);
+      return await this.userRepository.update(id, user);
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -125,6 +128,14 @@ export class UserService {
       return null;
     }
     return this.userRepository.findOne({ maso });
+  }
+
+  checkExistMasoUpdate(maso: string, id: number): Promise<User> {
+    return this.userRepository
+      .createQueryBuilder()
+      .where('maso = :maso', { maso })
+      .andWhere('id != :id', { id })
+      .getOne();
   }
 
   async import(file, khoa_id: number) {
@@ -245,14 +256,14 @@ export class UserService {
     res.send(buffer);
   }
 
-  async updateRole(id, role: string[]): Promise<User> {
+  async updateRole(id, role: string[]): Promise<UpdateResult> {
     try {
       // const options = { where: { id } };
       const user = await this.userRepository.findOne(id);
       console.log('user find one nè', user, user.roles, role);
 
       user.roles = role;
-      return await this.userRepository.update(user);
+      return await this.userRepository.update(id, user);
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -366,20 +377,20 @@ export class UserService {
 
       // update the password
       user.matkhau = hash;
-      await this.update(user);
+      await this.update(user.id, user);
       return;
     } catch (error) {
       throw new HttpException(error.message, error.code ?? 400);
     }
   }
 
-  async resetPassword(id: number): Promise<User> {
+  async resetPassword(id: number): Promise<UpdateResult> {
     try {
       const user = await this.findOne({ id });
       const saltOrRounds = 10;
       const hash = await bcrypt.hash('12345678', saltOrRounds);
       user.matkhau = hash;
-      return await this.update(user);
+      return await this.update(id, user);
     } catch (error) {
       throw new HttpException(error, 400);
     }
