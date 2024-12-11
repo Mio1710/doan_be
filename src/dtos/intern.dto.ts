@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEmpty } from 'class-validator';
+import { IsNotEmpty, IsEmpty, IsOptional } from 'class-validator';
 
 export class CreateInternDto {
   @IsNotEmpty()
@@ -22,6 +22,8 @@ export class CreateInternDto {
   @IsNotEmpty()
   supervisor_email: string;
 
+  @IsOptional()
+  teacher_id: number;
 }
 
 export class UpdateInternDto {
