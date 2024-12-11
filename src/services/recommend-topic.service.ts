@@ -41,7 +41,22 @@ export class RecommendTopicService {
       console.log('options', options);
 
       const recommendTopic = await this.recommendTopicRepository.findOne({
+        select: {
+          id: true,
+          ten: true,
+          knowledge: true,
+          description: true,
+          status: true,
+          reject_reason: true,
+          teacher_id: true,
+          teacher: {
+            id: true,
+            ten: true,
+            hodem: true,
+          },
+        },
         where: { ...options },
+        relations: ['teacher'],
       });
       console.log('recommendTopic', recommendTopic);
 

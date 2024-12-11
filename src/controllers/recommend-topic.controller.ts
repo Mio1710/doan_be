@@ -28,7 +28,7 @@ export class RecommendTopicController {
     const data = await this.recommendTopicService.findOne({
       created_by: student_id,
     });
-    return this.responseUtils.success({ data }, res);
+    return this.responseUtils.success({ data: data ? [data] : [] }, res);
   }
 
   @Post()

@@ -100,6 +100,7 @@ export class SemesterService {
           'end_defense',
           'start_report_topic',
           'end_report_topic',
+          'public_result',
         ],
       });
       await this.cacheManager.set('activeSemester', semester);
