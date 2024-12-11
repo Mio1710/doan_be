@@ -77,6 +77,11 @@ export class ResultService {
       throw new HttpException('Student id is required', 400);
     }
     const student_topic = await this.getStudentResult(student_id);
+    console.log('student topic in result', student_id, student_id);
+    if(!student_topic) {
+      throw new HttpException('Bạn chưa đăng ký khóa luận', 400)
+    }
+    
 
     try {
       const result = await this.LORepository.createQueryBuilder('lo')
