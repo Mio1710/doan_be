@@ -15,7 +15,7 @@ const accessKeyId = process.env.S3_ACCESS_KEY;
 const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
 
 const s3 = new S3Client({
-  region,
+  region: region,
   credentials: {
     accessKeyId,
     secretAccessKey,
@@ -23,6 +23,8 @@ const s3 = new S3Client({
 });
 
 export async function uploadFile(body, fileKey) {
+  console.log('check region', region);
+  
   const params = {
     Bucket: bucketName,
     Key: fileKey,
