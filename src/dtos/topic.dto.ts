@@ -86,6 +86,9 @@ export class CreateRecommendTopicDto {
 
   @IsNotEmpty()
   description: string;
+
+  @IsOptional()
+  status: string;
 }
 
 export class RecommendTopicStatusDto {
