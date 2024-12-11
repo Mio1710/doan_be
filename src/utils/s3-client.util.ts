@@ -9,27 +9,20 @@ import * as dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
-const bucketName = process.env.S3_BUCKET_NAME;
-const region = process.env.S3_REGION;
+const bucketName = 'do-an-khoa-luan';
+const region = 'ap-east-1';
+const accessKeyId = 'AKIA6J5RDGTJ4UEMVOXX';
+const secretAccessKey = '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';
 
-function getS3Client() {
-  const region = process.env.S3_REGION;
-  const accessKeyId = process.env.S3_ACCESS_KEY;
-  const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
-
-  const s3 = new S3Client({
-    region: region,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-  });
-  return s3;
-}
+const s3 = new S3Client({
+  region,
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
+});
 
 export async function uploadFile(body, fileKey) {
-  console.log('check region', region);
-  const s3 = getS3Client();
   const params = {
     Bucket: bucketName,
     Key: fileKey,
@@ -42,7 +35,6 @@ export async function uploadFile(body, fileKey) {
 }
 
 export async function downloadFile(key: string) {
-  const s3 = getS3Client();
   const params = {
     Bucket: bucketName,
     Key: key,
@@ -53,7 +45,6 @@ export async function downloadFile(key: string) {
 }
 
 export async function deleteFile(key: string) {
-  const s3 = getS3Client();
   const params = {
     Bucket: bucketName,
     Key: key,
