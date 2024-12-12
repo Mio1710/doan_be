@@ -61,6 +61,9 @@ export class UpdateStudentTopicDto {
 
   @IsOptional()
   topic_id?: number;
+
+  @IsOptional()
+  user_ids?: number[];
 }
 
 export class UpdateStudentInternDto {

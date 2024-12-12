@@ -115,8 +115,8 @@ export class SemesterService {
       throw new HttpException('Semester not found', 404);
     }
     const currentDate = new Date();
-    const startDate = new Date(semester.start_date);
-    const endDate = new Date(semester.end_date);
+    const startDate = new Date(semester.start_register_group);
+    const endDate = new Date(semester.end_register_group);
 
     console.log('allowRegisterGroup', currentDate, startDate, endDate);
 

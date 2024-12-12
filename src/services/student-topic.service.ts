@@ -1,11 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Group, Student, StudentTopic } from 'src/entities';
+import { Group, Student, StudentTopic, Topic } from 'src/entities';
 import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ClsService } from 'nestjs-cls';
 import { SemesterService } from './semester.service';
 import { parse } from 'date-fns';
 import { ImportStudentDto } from 'src/dtos';
@@ -25,7 +24,8 @@ export class StudentTopicService {
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
 
-    private readonly cls: ClsService,
+    @InjectRepository(Topic)
+    private readonly topicRepository: Repository<Topic>,
 
     private readonly semesterService: SemesterService,
   ) {}
@@ -125,7 +125,16 @@ export class StudentTopicService {
   async update(studentId: number, data): Promise<StudentTopic> {
     try {
       const studentTopic = await this.findOne({ student_id: studentId });
-
+      // check number student of topic
+      if (!data.user_ids) {
+        const isEnough = await this.isEnoughStudent(data.topic_id);
+        if (isEnough) {
+          throw new HttpException(
+            'Đề tài đã đủ thành viên, không thể đăng ký',
+            400,
+          );
+        }
+      }
       const getPartnerTopic = await this.studentTopicRepository.findOne({
         where: { student_id: data.partner_id },
       });
@@ -145,7 +154,9 @@ export class StudentTopicService {
           })
           .execute();
       }
-      if (data.user_ids) {
+      console.log('check data 0', data, data.user_ids);
+
+      if (data?.user_ids && data?.user_ids[0]) {
         // cancel group
         await this.cancelGroup(studentId);
       }
@@ -160,6 +171,24 @@ export class StudentTopicService {
 
   async save(studentTopic: StudentTopic[]): Promise<StudentTopic[]> {
     return await this.studentTopicRepository.save(studentTopic);
+  }
+
+  async isEnoughStudent(topic_id: number) {
+    const currentSemester = await this.semesterService.getActiveSemester();
+    const topic = await this.topicRepository.findOne({
+      where: { id: topic_id },
+    });
+    const studentTopics = await this.studentTopicRepository.find({
+      where: { topic_id, semester_id: currentSemester.id },
+    });
+    console.log(
+      'studentTopics.leng',
+      topic_id,
+      studentTopics.length,
+      topic.numberStudent,
+    );
+
+    return studentTopics.length >= topic.numberStudent;
   }
 
   async delete(student_id: number) {

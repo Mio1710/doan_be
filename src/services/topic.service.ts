@@ -50,10 +50,14 @@ export class TopicService {
         'user.ten',
         'user.hodem',
         'user.id',
-      ]);
-
-    // add condition
-    query
+      ])
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT(studentTopic.id)', 'currentNumberStudent')
+          .from('student_topics', 'studentTopic')
+          .leftJoin('studentTopic.topic', 'topicAlias') // Alias topic in subquery
+          .where('studentTopic.topic_id = topic.id'); // Match topic.id with subquery
+      }, 'currentNumberStudent')
       .where('semester.semester_id = :semester_id', { semester_id })
       .andWhere('topic.khoa_id = :khoa_id', { khoa_id });
 
@@ -66,7 +70,26 @@ export class TopicService {
       });
     }
 
-    return await query.getMany();
+    const result = await query.getRawMany();
+    // map data
+    return result.map(
+      (topic) =>
+        ({
+          id: topic.topic_id,
+          ten: topic.topic_ten,
+          description: topic.topic_description,
+          requirement: topic.topic_requirement,
+          knowledge: topic.topic_knowledge,
+          status: topic.topic_status,
+          numberStudent: topic.topic_numberStudent,
+          teacher: {
+            id: topic.user_id,
+            ten: topic.user_ten,
+            hodem: topic.user_hodem,
+          },
+          currentNumberStudent: parseInt(topic.currentNumberStudent),
+        }) as unknown as Topic,
+    );
   }
 
   async create(topic): Promise<Topic> {
