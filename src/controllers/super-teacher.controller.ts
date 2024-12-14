@@ -28,7 +28,6 @@ export class SuperTeacherController {
     console.log('responseUtils', responseUtils);
   }
 
-  @Roles('super_teacher')
   @Get('student-topic')
   async getStudentTopic(@Res() res, @Req() req) {
     const khoa_id = req.user.khoa_id;
