@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReportTopicDto, UpdateReportTopicDto } from 'src/dtos';
+import { AllowReportTopicGuard } from 'src/guards/allow-report-topic.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { ReportTopicService } from 'src/services';
 import { ResponseUtils } from 'src/utils';
@@ -30,6 +31,7 @@ export class ReportTopicController {
   ) {}
 
   @Post()
+  @UseGuards(AllowReportTopicGuard)
   @UseInterceptors(FileInterceptor('file'))
   async createReportTopic(
     @UploadedFile() file,
@@ -74,6 +76,7 @@ export class ReportTopicController {
   }
 
   @Put(':id')
+  @UseGuards(AllowReportTopicGuard)
   @UseInterceptors(FileInterceptor('file'))
   async updateReportTopic(
     @UploadedFile() file,
@@ -87,6 +90,7 @@ export class ReportTopicController {
   }
 
   @Delete(':id')
+  @UseGuards(AllowReportTopicGuard)
   async deleteReportTopic(@Res() res, @Param() id: number) {
     const data = await this.reportTopicService.delete(id);
     return this.responseUtils.success({ data }, res);

@@ -43,6 +43,8 @@ export class ResultController {
   @Get('lo')
   async getLOResult(@Req() req, @Res() res) {
     const userId = req.user.id;
+    console.log('lo id', userId);
+
     const data = await this.resultService.getStudentResultLO(userId);
     console.log('lo data', data);
     return this.responseUtils.success({ data }, res);

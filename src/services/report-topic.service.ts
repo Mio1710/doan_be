@@ -53,12 +53,18 @@ export class ReportTopicService {
   }
 
   async getLists(options): Promise<ReportTopic[]> {
-    const studentId = options.student_id;
-    const studentTopic = await this.getStudentTopic(studentId);
-    return await this.reportTopicRepository.find({
-      where: { student_topic_id: studentTopic.id },
-      order: { created_at: 'DESC' },
-    });
+    try {
+      const studentId = options.student_id;
+      const studentTopic = await this.getStudentTopic(studentId);
+      return await this.reportTopicRepository.find({
+        where: { student_topic_id: studentTopic.id },
+        order: { created_at: 'DESC' },
+      });
+    } catch (error) {
+      console.log('error getLists', error);
+
+      throw new HttpException('Bạn chưa đăng ký khóa luận', 400);
+    }
   }
 
   async findOne(options): Promise<ReportTopic> {
@@ -102,6 +108,8 @@ export class ReportTopicService {
 
   async getStudentTopic(student_id: number): Promise<StudentTopic> {
     const activeSemester = await this.semesterService.getActiveSemester();
+    console.log('check student topic', student_id);
+
     return await this.studentTopicService.findOne({
       student_id,
       semester_id: activeSemester.id,
@@ -119,5 +127,22 @@ export class ReportTopicService {
 
   async deleteFile(fileKey: string) {
     return await deleteFile(fileKey);
+  }
+
+  // check if student have not create group
+  async checkStudentGroup(studentId: number): Promise<boolean> {
+    try {
+      const currentSemester = await this.semesterService.getActiveSemester();
+      const studentTopic = await this.studentTopicService.findOne({
+        student_id: studentId,
+        semester_id: currentSemester.id,
+      });
+      if (studentTopic.group_id) {
+        return true;
+      }
+    } catch (error) {
+      return false;
+    }
+    return false;
   }
 }

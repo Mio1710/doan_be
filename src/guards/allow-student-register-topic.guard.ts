@@ -8,7 +8,7 @@ export class AllowStudentRegisterTopicGuard implements CanActivate {
   async canActivate(): Promise<boolean> {
     try {
       const isAllowRegisterTopic =
-        await this.semesterService.allowPublishTopic();
+        await this.semesterService.allowRegisterTopic();
       console.log('isAllowRegisterTopic', isAllowRegisterTopic);
 
       if (!isAllowRegisterTopic) {

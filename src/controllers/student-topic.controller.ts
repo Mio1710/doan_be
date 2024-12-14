@@ -8,7 +8,8 @@ import {
   UploadedFile,
   UseGuards,
   Req,
-  Param,
+  Query,
+  HttpException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorators/role.decorator';
@@ -29,9 +30,9 @@ export class StudentTopicController {
   ) {}
 
   @Get()
-  async getListUsers(@Res() res, @Req() req, @Param() params) {
+  async getListUsers(@Res() res, @Req() req, @Query() query) {
     const khoa_id = req.user.khoa_id;
-    const data = await this.studentTopicService.getLists(khoa_id, params);
+    const data = await this.studentTopicService.getLists(khoa_id, query);
     return this.responseUtils.success({ data }, res);
   }
 
@@ -60,22 +61,20 @@ export class StudentTopicController {
 
   @Get('registed')
   async getTopicRegistedDetail(@Res() res, @Req() req) {
-    try {
-      const userId = req.user.id;
-      const data = await this.studentTopicService.getRegistedDetail(userId);
-      console.log('topic data', data);
-
-      return this.responseUtils.success({ data }, res);
-    } catch (error) {
-      console.log('error', error);
-    }
+    const userId = req.user.id;
+    const data = await this.studentTopicService.getRegistedDetail(userId);
+    return this.responseUtils.success({ data }, res);
   }
 
   @UseGuards(AllowStudentRegisterTopicGuard)
   @Post('register')
-  async getTopicRegistedDetailById(@Res() res, @Req() req, @Body() topic) {
+  async getTopicRegistedDetailById(
+    @Res() res,
+    @Req() req,
+    @Body('topic_id') topic,
+  ) {
     const userId = req.user.id;
-    const data = await this.studentTopicService.update(userId, topic);
+    const data = await this.studentTopicService.registerTopic(userId, topic);
 
     return this.responseUtils.success({ data }, res);
   }
@@ -88,9 +87,17 @@ export class StudentTopicController {
     @Body() topic: UpdateStudentTopicDto,
   ) {
     const userId = req.user.id;
-    console.log('check data update', topic, userId, topic.topic_id);
 
     const data = await this.studentTopicService.update(userId, topic);
+    return this.responseUtils.success({ data }, res);
+  }
+
+  @UseGuards(AllowStudentRegisterTopicGuard)
+  @Post('cancel-topic')
+  async cancelTopic(@Res() res, @Req() req) {
+    const userId = req.user.id;
+
+    const data = await this.studentTopicService.cancelTopic(userId);
     return this.responseUtils.success({ data }, res);
   }
 

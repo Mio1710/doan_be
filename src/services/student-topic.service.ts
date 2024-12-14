@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import * as XLSX from 'xlsx';
 import { log } from 'console';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository, UpdateResult } from 'typeorm';
 import { SemesterService } from './semester.service';
 import { parse } from 'date-fns';
 import { ImportStudentDto } from 'src/dtos';
@@ -30,46 +30,46 @@ export class StudentTopicService {
     private readonly semesterService: SemesterService,
   ) {}
 
-  async getLists(khoa_id, params): Promise<Student[]> {
+  async getLists(khoa_id, query): Promise<Student[]> {
     const semester = await this.semesterService.getActiveSemester();
-    const options = {
-      select: {
-        id: true,
-        maso: true,
-        hodem: true,
-        ten: true,
-        email: true,
-        lop: true,
-        phone: true,
-        studentTopic: {
-          group_id: true,
-          topic: {
-            ten: true,
-            teacher: {
-              hodem: true,
-              ten: true,
-            },
-          },
-        },
-      },
-      where: {
-        khoa_id,
-        studentTopic: {
-          status: 'new',
-          semester: { id: semester.id },
-        },
-      },
-      relations: {
-        studentTopic: {
-          topic: {
-            teacher: true,
-          },
-        },
-      },
-    };
-    console.log('options1111', options, params);
 
-    return this.studentRepository.find({ ...options });
+    console.log('options1111', query);
+
+    const queryBuilder = this.studentRepository
+      .createQueryBuilder('students')
+      .leftJoinAndSelect('students.studentTopic', 'studentTopic')
+      .leftJoinAndSelect('studentTopic.topic', 'topic')
+      .leftJoinAndSelect('topic.teacher', 'teacher')
+      .select([
+        'students.id',
+        'students.maso',
+        'students.hodem',
+        'students.ten',
+        'students.email',
+        'students.lop',
+        'students.phone',
+        'studentTopic.group_id',
+        'topic.ten',
+        'teacher.hodem',
+        'teacher.ten',
+      ])
+      .where('students.khoa_id = :khoa_id', { khoa_id })
+      .andWhere('studentTopic.status = :status', { status: 'new' })
+      .andWhere('studentTopic.semester_id = :semester_id', {
+        semester_id: semester.id,
+      });
+
+    if (query?.filter?.q) {
+      queryBuilder.andWhere(
+        'students.maso like :q or students.hodem like :q or students.ten like :q or students.email like :q or students.lop like :q or students.phone like :q',
+        { q: `%${query.filter.q}%` },
+      );
+    }
+    // pagination
+    const page = parseInt(query?.page, 10) || 1;
+    queryBuilder.offset((page - 1) * 100).limit(100);
+
+    return await queryBuilder.getMany();
   }
 
   async find(options): Promise<StudentTopic[]> {
@@ -122,7 +122,62 @@ export class StudentTopicService {
     });
   }
 
-  async update(studentId: number, data): Promise<StudentTopic> {
+  async registerTopic(
+    studentId: number,
+    topicId: number,
+  ): Promise<UpdateResult> {
+    try {
+      const currentSemester = await this.semesterService.getActiveSemester();
+      // check if student already in semester topic
+      const studentTopic = await this.studentTopicRepository.findOne({
+        where: { student_id: studentId, semester_id: currentSemester.id },
+      });
+      console.log('studentTopic1111', studentTopic);
+
+      if (!studentTopic) {
+        throw new HttpException('Bạn chưa đăng ký học phần Khóa luận', 400);
+      }
+      if (studentTopic.topic_id) {
+        throw new HttpException('Bạn đã có đề tài', 400);
+      }
+      const isEnough = await this.isEnoughStudent(topicId);
+      if (isEnough) {
+        throw new HttpException(
+          'Đề tài đã đủ thành viên, không thể đăng ký',
+          400,
+        );
+      }
+      return await this.studentTopicRepository.update(studentTopic.id, {
+        student_id: studentId,
+        topic_id: topicId,
+        semester_id: currentSemester.id,
+      });
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async cancelTopic(studentId: number): Promise<UpdateResult> {
+    try {
+      const currentSemester = await this.semesterService.getActiveSemester();
+      const studentTopic = await this.studentTopicRepository.findOne({
+        where: { student_id: studentId, semester_id: currentSemester.id },
+      });
+      if (!studentTopic) {
+        throw new HttpException('Thao tác không hợp lệ', 404);
+      }
+      if (studentTopic.group_id) {
+        await this.cancelGroup(studentId);
+      }
+      return await this.studentTopicRepository.update(studentTopic.id, {
+        topic_id: null,
+      });
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async update(studentId: number, data): Promise<UpdateResult> {
     try {
       const studentTopic = await this.findOne({ student_id: studentId });
       // check number student of topic
@@ -163,7 +218,10 @@ export class StudentTopicService {
 
       console.log('studentTopic11111', data, studentTopic);
 
-      return await this.studentTopicRepository.save(studentTopic);
+      return await this.studentTopicRepository.update(
+        studentTopic.id,
+        studentTopic,
+      );
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -376,7 +434,11 @@ export class StudentTopicService {
         })
         .getOne();
 
-      if (result.topic.id) {
+      if (!result.topic) {
+        throw new HttpException('Bạn chưa đăng ký đồ án', 400);
+      }
+
+      if (result?.topic?.id) {
         result.students = await this.studentRepository
           .createQueryBuilder('students')
           .select(['students', 'topic.group_id'])
@@ -425,33 +487,17 @@ export class StudentTopicService {
     if (!group || !group.first_partner_id || !group.second_partner_id) {
       throw new HttpException('Bad Request', 400);
     }
-    const partnerId =
-      group.first_partner_id === studentId
-        ? group.second_partner_id
-        : group.first_partner_id;
-
-    console.log('partnerId', partnerId);
-
-    // set second_partner_id = null for partner and set first_partner_id = partnerId
-    await this.groupRepository
-      .createQueryBuilder()
-      .update(Group)
-      .set({ firstPartner: { id: partnerId }, secondPartner: null })
-      .where('id = :id', {
-        id: group.id,
-      })
-      .execute();
 
     // set group_id = null for student excute cancel group
     await this.studentTopicRepository
       .createQueryBuilder()
       .update(StudentTopic)
       .set({ group_id: null })
-      .where('student_id IN (:...studentId)', {
-        studentId: [studentId, partnerId],
-      })
+      .where('group_id = :group_id', { group_id: group.id })
       .execute();
 
+    //delete group
+    await this.groupRepository.delete(group.id);
     return true;
   }
 
