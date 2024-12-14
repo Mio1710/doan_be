@@ -81,14 +81,13 @@ export class StudentTopicService {
     let user = await this.checkExistStudent(student.maso);
     const currentSemester = await this.semesterService.getActiveSemester();
     if (user) {
-      console.log('Student already exists', user);
       // check if student already in semester
       const studentTopic = await this.checkExistStudentTopic(
         user.id,
         currentSemester.id,
       );
       if (studentTopic) {
-        throw new HttpException('Student already exists', 400);
+        throw new HttpException('Sinh viên đã tồn tại', 400);
       } else {
         await this.activeSemester([user.id], currentSemester.id);
       }

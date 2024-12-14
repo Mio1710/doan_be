@@ -25,7 +25,7 @@ export class CreateUserDTO {
 
   @IsOptional()
   @Length(6, 20)
-  matkhau: string = '123456';
+  matkhau: string = '12345678';
   // matkhau: string;
 
   @IsOptional()

@@ -28,7 +28,7 @@ export class StudentService {
     log('student before create', student);
     const isExist = await this.checkExistStudent(student.maso);
     if (isExist) {
-      throw new HttpException('Student already exists', 400);
+      throw new HttpException('Sinh viên đã tồn tại', 400);
     }
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(student.matkhau, saltOrRounds);
@@ -93,9 +93,6 @@ export class StudentService {
       const students = await Promise.all(
         data.map(async (student: Student) => {
           const isExist = await this.checkExistStudent(student.maso);
-          if (isExist) {
-            console.log('Student already exists');
-          }
 
           const saltOrRounds = 10;
           const hash = await bcrypt.hash('12345678', saltOrRounds);
