@@ -13,6 +13,7 @@ export class FaculityController {
 
   @Get()
   getListFaculitys(): Promise<Faculity[]> {
+    // check log
     return this.faculityService.getLists();
   }
 
