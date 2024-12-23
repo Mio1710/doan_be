@@ -18,7 +18,7 @@ export class AllowReportTopicGuard implements CanActivate {
       request.user.id,
     );
     if (!isAllowRegisterGroup) {
-      throw new HttpException('Không thể nộp báo', 400);
+      throw new HttpException('Chưa thể nộp báo cáo', 400);
       return false;
     }
     return true;

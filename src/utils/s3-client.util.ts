@@ -9,10 +9,10 @@ import * as dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
-const bucketName = 'do-an-khoa-luan';
-const region = 'ap-east-1';
-const accessKeyId = 'AKIA6J5RDGTJ4UEMVOXX';
-const secretAccessKey = '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';
+const bucketName = process.env.BUCKET_NAME;
+const region = process.env.REGION;
+const accessKeyId = process.env.ACCESS_KEY;
+const secretAccessKey = process.env.SECRET_KEY 
 
 const s3 = new S3Client({
   region,
